@@ -126,8 +126,9 @@
           .attr("width", width)
           .attr("height", height);
 
-  var desc = d3.select(containerGraph).append("div");
-    desc.append("h3");
+  var desc = d3.select(containerGraph).append("div")
+    .style("height","120px");
+    desc.append("h4");
     desc.append("p");
 
 
@@ -282,7 +283,7 @@
               return  start < circleX && circleX < end
             })[0];
 
-            desc.selectAll("h3").text(activeLabel ? activeLabel.title : "");
+            desc.selectAll("h4").text(activeLabel ? activeLabel.title : "");
             desc.selectAll("p").text(activeLabel? activeLabel.text : "");
          }
 
