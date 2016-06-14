@@ -127,7 +127,8 @@
           .attr("height", height);
 
   var desc = d3.select(containerGraph).append("div")
-    .style("height","120px");
+    .attr("class", "graph-description");
+
     desc.append("h4");
     desc.append("p");
 
