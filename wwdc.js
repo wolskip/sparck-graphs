@@ -145,7 +145,7 @@
       // Scale the range of the data
       x.domain([0,480]);
       updateTimeDomain();
-      y.domain([d3.min(data.balance), d3.max(data.balance)]);
+      y.domain([d3.min(data.balance) - 4, d3.max(data.balance) + 4]);
 
       zoom.x(x);
 
