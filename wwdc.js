@@ -169,7 +169,7 @@
           .attr("x", x(0))
           .attr("y", y(0))
           .attr("width", x(480) - x(0))
-          .attr("height", height - y(0));
+          .attr("height", Math.max(0, height - y(0)));
 
           svg.append("clipPath")
               .attr("id", "clip-all")
