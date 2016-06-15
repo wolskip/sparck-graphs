@@ -16,7 +16,7 @@
     {
       "start": new Date(2016, 5, 13, 18, 42, 0, 0),
       "end": new Date(2016, 5, 13, 19, 7, 0, 0),
-      "title": "iOS was the most popular updates. ",
+      "title": "iOS was the most popular update. ",
       "text": "This should come as no surprise, but people found the iOS section of the Keynote the most engaging. Pundits were overjoyed to hear about new emoji and updates to Apple Music - but it was clear from both the audience reaction and SPARCK analysis that developers being asked to ‘rap along to their favourite tunes’ was an unpopular request."
     },
     {
