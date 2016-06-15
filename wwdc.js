@@ -2,32 +2,32 @@
   var containerGraph = '.chart-graph';
   var labels = [
     {
-      "start": "2016-06-13 17:45",
-      "end": "2016-06-13 17:55",
+      "start": new Date(2016, 5, 13, 17, 45, 0, 0),
+      "end": new Date(2016, 5, 13, 17, 55, 0, 0),
       "title": "Expectations were high, but sentiment dropped after the event started.",
       "text": "Right up until 6PM, a significant positive spike in the way people were talking about WWDC was apparent. There was a real sense of excitement, largely provoked by months of rumours about what was about to drop. However, when the event started, sentiment peaked, and took a steady decline right up until it moved into MacOS and iOS territory. "
     },
     {
-      "start": "2016-06-13 18:27",
-      "end": "2016-06-13 18:36",
+      "start": new Date(2016, 5, 13, 18, 27, 0, 0),
+      "end": new Date(2016, 5, 13, 18, 36, 0, 0),
       "title": "TVOS just didn’t go down well.",
       "text": "This whole section of the Keynote fared pretty badly: Twitter was alive with tweets describing the presenter as patronising and boring, and the new features as deeply uninspiring."
     },
     {
-      "start": "2016-06-13 18:42",
-      "end": "2016-06-13 19:7",
+      "start": new Date(2016, 5, 13, 18, 42, 0, 0),
+      "end": new Date(2016, 5, 13, 19, 7, 0, 0),
       "title": "iOS was the most popular updates. ",
       "text": "This should come as no surprise, but people found the iOS section of the Keynote the most engaging. Pundits were overjoyed to hear about new emoji and updates to Apple Music - but it was clear from both the audience reaction and SPARCK analysis that developers being asked to ‘rap along to their favourite tunes’ was an unpopular request."
     },
     {
-      "start": "2016-06-13 19:15",
-      "end": "2016-06-13 19:23",
+      "start": new Date(2016, 5, 13, 19, 15, 0, 0),
+      "end": new Date(2016, 5, 13, 19, 23, 0, 0),
       "title": "HomeKit, Messages and new features in the Phone app went down a treat.",
       "text": "New features in iOS let you see who’s at your door intercom from your phone, see your voicemail messages as text, and a whole host of new messaging features such as emoji, live backgrounds and stickers were really well received."
     },
     {
-      "start": "2016-06-13 19:38",
-      "end": "2016-06-13 20:20",
+      "start": new Date(2016, 5, 13, 19, 38, 0, 0),
+      "end": new Date(2016, 5, 13, 20, 20, 0, 0),
       "title": "Kids learning to code was popular amongst the developer community. ",
       "text": "Apple's announcement to offer a free learning tool for kids to learn their programming language, Swift, could have been met with some cynicism. However, SPARCK analysis shows that this news was warmly welcomed."
     }
@@ -323,7 +323,7 @@
   }
 
   function getDateX(date){
-     var offset = timeToX(new Date(date));
+     var offset = timeToX(date);
      return x(offset);
   }
 
