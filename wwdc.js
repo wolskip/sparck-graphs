@@ -300,8 +300,7 @@
               zoom.translate([min, currentTranstate[1]]);
             }
             updateTimeDomain();
-             redraw();
-             console.log(zoom.scale(), zoom.translate(), min);
+            redraw();
          }
   }
 
