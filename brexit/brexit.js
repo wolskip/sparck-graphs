@@ -114,7 +114,7 @@ function drawGraph(containerGraph, updateData, tickFormat)
         if (tickFormat != undefined)
         {
             svg.append("path")
-            .attr("class", "xaxis")
+            .attr("class", "xaxisbrexit")
             .style('stroke-width', thick)
             .attr("d", line([[0,y(50)],[width, y(50)]]));
         }
