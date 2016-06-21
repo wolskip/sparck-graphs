@@ -84,11 +84,12 @@ function drawGraph(containerGraph, updateData, tickFormat)
         .attr("height", height);
 
 
-  var desc = d3.select(containerGraph).append("div")
-    .attr("class", "graph-description");
-
-    desc.append("h4");
-    desc.append("p");
+  var desc = d3.select(containerGraph);
+  // .append("div")
+  //   .attr("class", "graph-description");
+  //
+  //   desc.append("h4");
+  //   desc.append("p");
 
   var data;
   var zoom = d3.behavior.zoom();
