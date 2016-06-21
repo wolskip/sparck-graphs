@@ -21,11 +21,11 @@ path {
 {
     stroke: grey;
 }
-.positiveStrokeColor, .line-remain
+.line-remain
 {
-   stroke: blue;
+   stroke: #1a84ec;
 }
-.negativeStrokeColor, .line-leave
+.line-leave
 {
    stroke: #FF0000;
 }
@@ -54,16 +54,33 @@ svg
     font-size: 16px;
 }
 
+
+.slider{
+  position: relative;
+  width: 500px;
+  margin: auto;
+  height: 20px;
+  background-color: red;
+}
+
+.slider-remain{
+  height: 20px;
+  background-color: #1a84ec;
+}
+
 </style>
 <body>
 
-<div class="chart-graph">
+<div class="count-chart">
 </div>
-<div class="chart-graph2">
+<div class="percentage-chart">
 </div>
+<div class="slider-chart">
+</div>
+
 
 <!-- load the d3.js library -->
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/momentjs/2.13.0/moment.min.js"></script>
-<script type="text/javascript" src="/brexit.js"></script>
+<script type="text/javascript" src="brexit.js"></script>
 </body>
