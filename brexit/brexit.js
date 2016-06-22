@@ -316,7 +316,7 @@ function drawGraph(containerGraph, updateData, tickFormat)
   function parseTimeValues()
   {
       data.time.forEach(function(element, i, arr) {
-          arr[i] = moment(element)._d;
+          arr[i] = moment(element).add(2, 'hours')._d; // convert from UTC - to UK summer + hour interval start -> interval end
       });
   }
 }
