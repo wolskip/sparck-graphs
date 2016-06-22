@@ -61,7 +61,7 @@
   var y = d3.scale.linear().range([height, 0]);
 
   var timeToX = d3.time.scale()
-    .range([0, 750])
+    .range([0, 700])
     .domain([new Date(2016, 5, 13, 17, 0, 0, 0), new Date(2016, 5, 13, 21, 0, 0, 0)])
 
 
@@ -291,7 +291,7 @@
          function mousezoom(){
 
             var currentTranstate = zoom.translate();
-            var min = -(x(750) - x(0) - width);
+            var min = -(x(700) - x(0) - width);
 
             if(currentTranstate[0] > 0){
               zoom.translate([0, currentTranstate[1]]);
