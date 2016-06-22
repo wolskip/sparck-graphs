@@ -173,7 +173,7 @@
           .attr("height", Math.max(0, height - y(0)));
 
           svg.append("clipPath")
-              .attr("id", "clip-all")
+              .attr("id", "clip-all-brexit")
               .append("rect")
               .attr("x", 0)
               .attr("y", 0)
@@ -192,7 +192,7 @@
 
         svg.append("path")
               .attr("class", "line-vals-average")
-              .attr("clip-path", "url(#clip-all)")
+              .attr("clip-path", "url(#clip-all-brexit)")
               .attr("d", valuelineaverage(data.balance));
 
 
@@ -200,19 +200,19 @@
         var labelGroups = labelElements.enter()
           .append("g")
             .attr("class", "label-group")
-            .attr("clip-path", "url(#clip-all)");
+            .attr("clip-path", "url(#clip-all-brexit)");
 
         labelGroups.append("path")
               .attr("class", "label-left")
-              .attr("clip-path", "url(#clip-all)")
+              .attr("clip-path", "url(#clip-all-brexit)")
               .attr("d", line([[0,0], [0,height]]));
         labelGroups.append("path")
               .attr("class", "label-right")
-              .attr("clip-path", "url(#clip-all)")
+              .attr("clip-path", "url(#clip-all-brexit)")
               .attr("d", line([[0,0], [0,height]]));
         labelGroups.append("path")
               .attr("class", "label-bottom")
-              .attr("clip-path", "url(#clip-all)")
+              .attr("clip-path", "url(#clip-all-brexit)")
               .attr("d", line([[0,0], [0,0]]));
 
 
