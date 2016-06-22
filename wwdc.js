@@ -53,7 +53,7 @@
 
   // Set the dimensions of the canvas / graph
   var margin = {top: 30, right: 20, bottom: 30, left: 50},
-      width = 750 - margin.left - margin.right,
+      width = 810 - margin.left - margin.right,
       height = 370 - margin.top - margin.bottom;
 
   // Set the ranges
@@ -61,7 +61,7 @@
   var y = d3.scale.linear().range([height, 0]);
 
   var timeToX = d3.time.scale()
-    .range([0, 700])
+    .range([0, 810])
     .domain([new Date(2016, 5, 13, 17, 0, 0, 0), new Date(2016, 5, 13, 21, 0, 0, 0)])
 
 
