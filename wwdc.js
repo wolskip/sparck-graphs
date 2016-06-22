@@ -291,7 +291,7 @@
          function mousezoom(){
 
             var currentTranstate = zoom.translate();
-            var min = -(x(width) - x(0) - width);
+            var min = -(x(600) - x(0) - width);
 
             if(currentTranstate[0] > 0){
               zoom.translate([0, currentTranstate[1]]);
