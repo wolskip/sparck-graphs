@@ -101,12 +101,14 @@ function drawGraph(containerGraph, updateData, tickFormat)
 
       maxDate = d3.min(data.time);
       minDate = d3.max(data.time);
+      
+      maxYValue = d3.max([d3.max(data.remain), d3.max(data.leave)]);
 
       var length = data.time.length;
 
       // Scale the range of the data
       x.domain([maxDate, minDate]);
-      y.domain([d3.min([d3.min(data.remain), d3.min(data.leave)]) - 4, d3.max([d3.max(data.remain), d3.max(data.leave)]) + 4]);
+      y.domain([d3.min([d3.min(data.remain), d3.min(data.leave)]) - 4, maxYValue + 4]);
 
       zoom.x(x);
 
@@ -176,21 +178,25 @@ function drawGraph(containerGraph, updateData, tickFormat)
             .attr("class", "focus-line")
             .attr("d", line([[0,0], [0,height]]));
 
-       var focusCircle = focusGroup.append("g");
-       focusCircle.append("circle").attr("r", 3);
+       var focusCircleRemain = focusGroup.append("g");
+       focusCircleRemain.append("circle").attr("r", 3);
 
-       var focusLabel = focusCircle
+       var focusLabelRemain = focusCircleRemain
         .append("text")
+        .attr("class", "focus-label-remain")
         .attr("dx", 5)
         .attr("dy",-5)
         .text("");
-
-        var focusLabelTime = focusCircle
-         .append("text")
-         .style("stroke", "#999")
-         .attr("dx", 5)
-         .attr("dy",-5)
-         .text("");
+        
+        var focusCircleLeave = focusGroup.append("g");
+        focusCircleLeave.append("circle").attr("r", 3);
+       
+        var focusLabelLeave = focusCircleLeave
+        .append("text")
+        .attr("class", "focus-label-leave")
+        .attr("dx", 5)
+        .attr("dy",-5)
+        .text("");
 
        svg.append("rect")
            .attr("class", "graph-overlay")
@@ -206,24 +212,40 @@ function drawGraph(containerGraph, updateData, tickFormat)
 
             var mouseX = d3.mouse(this)[0]
             var dataX = x.invert(mouseX);
+            var time = moment(dataX).add(1, 'hour').startOf('hour');
+            var index = indexOfDate(data.time, time._d);
+                     
+           if(index < 0){
+             focusGroup.style("display", "none");
+           } else {
+             focusGroup.style("display", null);
+             var circleX = x(dataX);
+             
+             var compare = data.leave[dataX] > data.remain[dataX];
+             var topPosition = y(d3.max([d3.max(data.leave), d3.max(data.remain)]));
+             var bottomPosition = topPosition + 30;
+             
+             var circleYRemain = data.leave[dataX] > data.remain[dataX] ? topPosition : bottomPosition;
+             var circleYLeave = data.leave[dataX] <= data.remain[dataX] ? bottomPosition : topPosition;
+             
+             var textLeave = tickFormat != undefined ? tickFormat(Math.round(data.leave[index])) : Math.round(data.leave[index]);
+             focusLabelLeave.text(textLeave);
+             
+             var textRemain = tickFormat != undefined ? tickFormat(Math.round(data.remain[index])) : Math.round(data.remain[index]);
+             focusLabelRemain.text(textRemain);
+             
+             focusLine.attr("transform", "translate(" + circleX + ",0)");
+             
+             focusCircleRemain.attr("transform", "translate(" + circleX + "," + circleYRemain  + ")");
+             focusCircleLeave.attr("transform", "translate(" + circleX + "," + circleYLeave  + ")");
+           }
 
-        //    if(!data.balance[dataX]){
-        //      focusGroup.style("display", "none");
-        //    } else {
-        //      focusGroup.style("display", null);
-        //      var circleX = x(dataX);
-        //      var circleY = y(data.balance[dataX] || 0)
-        //      focusLabel.text(Math.round(data.balance[dataX]) + " %")
-        //      focusLine.attr("transform", "translate(" + circleX + ",0)");
-        //      focusCircle.attr("transform", "translate(" + circleX + "," + circleY + ")");
-        //    }
+            // var activeLabel = labels.filter(function(label){
+            //   return  label.start < dataX && dataX < label.end
+            // })[0];
 
-            var activeLabel = labels.filter(function(label){
-              return  label.start < dataX && dataX < label.end
-            })[0];
-
-            desc.selectAll("h4").text(activeLabel ? activeLabel.title : "");
-            desc.selectAll("p").text(activeLabel? activeLabel.text : "");
+            // desc.selectAll("h4").text(activeLabel ? activeLabel.title : "");
+            // desc.selectAll("p").text(activeLabel? activeLabel.text : "");
          }
 
          function mousezoom(){
@@ -244,6 +266,13 @@ function drawGraph(containerGraph, updateData, tickFormat)
             }
             redraw();
          }
+  }
+  
+  function indexOfDate(myArray, searchDate) {
+    for(var i = 0, len = myArray.length; i < len; i++) {
+        if (myArray[i].toString() === searchDate.toString()) return i;
+    }
+    return -1;
   }
 
   function redraw(){
