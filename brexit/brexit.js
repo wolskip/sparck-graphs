@@ -336,7 +336,8 @@ function createSlider(){
    var remain = rawData.remain[rawData.remain.length - 1];
    var leave = rawData.leave[rawData.leave.length - 1];
 
-   var remainP = remain / (remain + leave) * 100;
+   var remainP = Math.round(remain / (remain + leave) * 100);
+   var leaveP =  Math.round(leave / (remain + leave) * 100);
 
    var container = d3.select('.slider-chart');
    var slider = container.append('div')
@@ -345,6 +346,17 @@ function createSlider(){
   slider.append('div')
       .attr('class', 'slider-remain')
       .style('width', remainP + '%')
+      .text(remainP + '%')
+
+  slider.append('div')
+      .attr('class', 'slider-leave')
+      .style('width', leaveP + '%')
+      .text(leaveP + '%')
+
+  container.append('div')
+    .attr('class', 'slider-time')
+    .text(moment(rawData.time[rawData.time.length -1]).format('MMMM Do YYYY, h:mm'))
+
 }
 
 
