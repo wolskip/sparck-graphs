@@ -35,8 +35,8 @@ function drawGraph(containerGraph, updateData, tickFormat)
   var loaded;
 
   // Set the dimensions of the canvas / graph
-  var margin = {top: 30, right: 20, bottom: 30, left: 50},
-      width = 900 - margin.left - margin.right,
+  var margin = {top: 30, right: 20, bottom: 30, left: 55},
+      width = 700 - margin.left - margin.right,
       height = 370 - margin.top - margin.bottom;
 
   // Set the ranges
@@ -121,7 +121,7 @@ function drawGraph(containerGraph, updateData, tickFormat)
         }
 
         svg.append("clipPath")
-            .attr("id", "clip-all")
+            .attr("id", "clip-all-brexit")
             .append("rect")
             .attr("x", 0)
             .attr("y", 0)
@@ -130,31 +130,31 @@ function drawGraph(containerGraph, updateData, tickFormat)
 
         svg.append("path")
               .attr("class", "line-remain")
-              .attr("clip-path", "url(#clip-all)")
+              .attr("clip-path", "url(#clip-all-brexit)")
               .attr("d", valueline(data.remain));
 
         svg.append("path")
               .attr("class", "line-leave")
-              .attr("clip-path", "url(#clip-all)")
+              .attr("clip-path", "url(#clip-all-brexit)")
               .attr("d", valueline(data.leave));
 
         // labelElements  = svg.selectAll(".graph-label").data(labels);
         // var labelGroups = labelElements.enter()
         //   .append("g")
         //     .attr("class", "label-group")
-        //     .attr("clip-path", "url(#clip-all)");
+        //     .attr("clip-path", "url(#clip-all-brexit)");
 
         // labelGroups.append("path")
         //       .attr("class", "label-left")
-        //       .attr("clip-path", "url(#clip-all)")
+        //       .attr("clip-path", "url(#clip-all-brexit)")
         //       .attr("d", line([[0,0], [0,height]]));
         // labelGroups.append("path")
         //       .attr("class", "label-right")
-        //       .attr("clip-path", "url(#clip-all)")
+        //       .attr("clip-path", "url(#clip-all-brexit)")
         //       .attr("d", line([[0,0], [0,height]]));
         // labelGroups.append("path")
         //       .attr("class", "label-bottom")
-        //       .attr("clip-path", "url(#clip-all)")
+        //       .attr("clip-path", "url(#clip-all-brexit)")
         //       .attr("d", line([[0,0], [0,0]]));
 
         //updateLabels();
