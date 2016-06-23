@@ -222,7 +222,7 @@ function drawGraph(containerGraph, updateData, tickFormat)
            .on("mouseover", function() { focusGroup.style("display", null);})
            .on("mouseout", function() { focusGroup.style("display", "none");})
            .on("mousemove", mousemove)
-           .call(zoom.scaleExtent([0.25, 10]).on("zoom", mousezoom))
+           .call(zoom.scaleExtent([0.2, 10]).on("zoom", mousezoom))
            .on("mousewheel.zoom", mousezoom);
 
          function mousemove() {
@@ -454,7 +454,7 @@ function createSlider(updateOnly){
 
       container.append('div')
         .attr('class', 'slider-time')
-        .text(moment(rawData.time[rawData.time.length -1]).format('MMMM Do YYYY, h:mm'))
+        .text(moment(rawData.time[rawData.time.length -1]).add(5, 'minutes').format('MMMM Do YYYY, H:mm'))
     }
     else
     {
@@ -465,8 +465,9 @@ function createSlider(updateOnly){
       d3.select('.slider-leave')
         .style('width', leaveP + '%')
         .text(leaveP + '%');
-
-      
+        
+        d3.select('.slider-time')
+         .text(moment(rawData.time[rawData.time.length -1]).add(5, 'minutes').format('MMMM Do YYYY, H:mm'))
     }
 }
 })();
