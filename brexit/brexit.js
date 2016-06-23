@@ -44,7 +44,17 @@ function drawGraph(containerGraph, updateData, tickFormat)
 
   // Define the axes
   var xAxis = d3.svg.axis().scale(x)
-                  .orient("bottom");
+                  .orient("bottom")
+                  .tickFormat(d3.time.format.multi([
+                    [".%L", function(d) { return d.getMilliseconds(); }],
+                    [":%S", function(d) { return d.getSeconds(); }],
+                    ["%_H:%M", function(d) { return d.getMinutes(); }],
+                    ["%_H:00", function(d) { return d.getHours(); }],
+                    ["%a %d", function(d) { return d.getDay() && d.getDate() != 1; }],
+                    ["%b %d", function(d) { return d.getDate() != 1; }],
+                    ["%B", function(d) { return d.getMonth(); }],
+                    ["%Y", function() { return true; }]
+                  ]));
 
   var yAxis = d3.svg.axis().scale(y)
               .orient("left")
@@ -90,20 +100,24 @@ function drawGraph(containerGraph, updateData, tickFormat)
 
   var data;
   var zoom = d3.behavior.zoom();
-  var maxDate, minDate;
+  var minDate, maxDate;
   var length, maxYValue;
 
   function updateDomain()
   {
-      maxDate = d3.min(data.time);
-      minDate = d3.max(data.time);
+      minDate = d3.min(data.time);
+      maxDate = d3.max(data.time);
       
       length = data.time.length;      
       
       maxYValue = d3.max([d3.max(data.remain), d3.max(data.leave)]);
 
-      // Scale the range of the data
-      x.domain([maxDate, minDate]);
+      // Scale the range of the data      
+      var minDate = new Date(maxDate);
+      minDate.setDate(minDate.getDate() - 3);
+      
+      x.domain([minDate, maxDate]);      
+      
       y.domain([d3.min([d3.min(data.remain), d3.min(data.leave)]) - 4, maxYValue + 4]);
   }
   
@@ -208,7 +222,7 @@ function drawGraph(containerGraph, updateData, tickFormat)
            .on("mouseover", function() { focusGroup.style("display", null);})
            .on("mouseout", function() { focusGroup.style("display", "none");})
            .on("mousemove", mousemove)
-           .call(zoom.scaleExtent([1, 40]).on("zoom", mousezoom))
+           .call(zoom.scaleExtent([0.25, 10]).on("zoom", mousezoom))
            .on("mousewheel.zoom", mousezoom);
 
          function mousemove() {
@@ -265,12 +279,15 @@ function drawGraph(containerGraph, updateData, tickFormat)
   
   function updatePosition(){
     
-    maxDate = d3.min(data.time);
-    minDate = d3.max(data.time);
-      
+    minDate = d3.min(data.time);
+    maxDate = d3.max(data.time);
+    
+    var minDate = new Date(maxDate);
+    minDate.setDate(minDate.getDate() - 3);
+    
     var currentTranstate = zoom.translate();
 
-    var length = x(minDate)-  x(maxDate);
+    var length = x(maxDate)-  x(minDate);
     var min = -(length - width);
     //console.log("min",min, length);
     //console.log("currentTranstate", currentTranstate[0])
