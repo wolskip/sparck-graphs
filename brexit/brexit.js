@@ -403,7 +403,7 @@ function drawGraph(containerGraph, updateData, tickFormat)
       });
   }
 
-  setInterval(loadCurrentData, 2000);  
+  setInterval(loadCurrentData, 60000);  
   
   function parseTimeValues()
   {
