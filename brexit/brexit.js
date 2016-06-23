@@ -25,10 +25,7 @@
 drawGraph(containerGraph1);
 drawGraph(containerGraph2, updateToPercentage, function(n){ return n + "%"; });
 
-
 var rawData;
-
-
 
 function drawGraph(containerGraph, updateData, tickFormat)
 {
@@ -94,22 +91,28 @@ function drawGraph(containerGraph, updateData, tickFormat)
   var data;
   var zoom = d3.behavior.zoom();
   var maxDate, minDate;
+  var length, maxYValue;
 
-  function loadGraph()
+  function updateDomain()
   {
-      loaded = true;
-
       maxDate = d3.min(data.time);
       minDate = d3.max(data.time);
       
+      length = data.time.length;      
+      
       maxYValue = d3.max([d3.max(data.remain), d3.max(data.leave)]);
-
-      var length = data.time.length;
 
       // Scale the range of the data
       x.domain([maxDate, minDate]);
       y.domain([d3.min([d3.min(data.remain), d3.min(data.leave)]) - 4, maxYValue + 4]);
-
+  }
+  
+  
+  function loadGraph()
+  {
+      loaded = true;
+     
+      updateDomain();
       zoom.x(x);
 
       var thick = 1;
@@ -205,17 +208,22 @@ function drawGraph(containerGraph, updateData, tickFormat)
            .on("mouseover", function() { focusGroup.style("display", null);})
            .on("mouseout", function() { focusGroup.style("display", "none");})
            .on("mousemove", mousemove)
-           .call(zoom.scaleExtent([1, 8]).on("zoom", mousezoom))
+           .call(zoom.scaleExtent([1, 40]).on("zoom", mousezoom))
            .on("mousewheel.zoom", mousezoom);
 
          function mousemove() {
 
             var mouseX = d3.mouse(this)[0]
             var dataX = x.invert(mouseX);
-            var time = moment(dataX).add(1, 'hour').startOf('hour');
-            var index = indexOfDate(data.time, time._d);
-                     
-           if(index < 0){
+            
+            
+            index = 0;
+            while(data.time[index] && dataX.getTime() > data.time[index].getTime()){
+              index ++
+            } 
+            index --;
+            
+           if(index < 0 || index > length -1){
              focusGroup.style("display", "none");
            } else {
              focusGroup.style("display", null);
@@ -249,23 +257,30 @@ function drawGraph(containerGraph, updateData, tickFormat)
          }
 
          function mousezoom(){
-
-            var currentTranstate = zoom.translate();
-
-            var length = x(minDate)-  x(maxDate);
-            var min = -(length - width);
-            //console.log("min",min, length);
-            //console.log("currentTranstate", currentTranstate[0])
-
-            if(currentTranstate[0] > 0){
-              zoom.translate([0, currentTranstate[1]]);
-            }
-
-            if(currentTranstate[0] < min){
-                zoom.translate([min, currentTranstate[1]]);
-            }
+            updatePosition();
             redraw();
-         }
+         }          
+         
+  }
+  
+  function updatePosition(){
+    
+    maxDate = d3.min(data.time);
+    minDate = d3.max(data.time);
+      
+    var currentTranstate = zoom.translate();
+
+    var length = x(minDate)-  x(maxDate);
+    var min = -(length - width);
+    //console.log("min",min, length);
+    //console.log("currentTranstate", currentTranstate[0])
+
+    // if(currentTranstate[0] > 0){
+    //   zoom.translate([0, currentTranstate[1]]);
+    // }
+
+    //if(currentTranstate[0] < min){
+    zoom.translate([min, currentTranstate[1]]);
   }
   
   function indexOfDate(myArray, searchDate) {
@@ -276,8 +291,7 @@ function drawGraph(containerGraph, updateData, tickFormat)
   }
 
   function redraw(){
-    //var svg = d3.select(containerGraph).transition();
-
+    
     // Add the valueline path.
     svg.select(".line-leave").attr("d", valueline(data.leave));
     svg.select(".line-remain").attr("d", valueline(data.remain));
@@ -316,37 +330,74 @@ function drawGraph(containerGraph, updateData, tickFormat)
   loadPastData();
   function loadPastData()
   {
-      jsonWithRetry("https://ps4ez07vul.execute-api.eu-west-1.amazonaws.com/v1/brexit/graph", 3, function(json) {
+      jsonWithRetry("https://ps4ez07vul.execute-api.eu-west-1.amazonaws.com/v1/brexit/graph2", 3, function(json) {
+          
           data = json;
-
-          if (updateData != undefined)
+         
+          parseTimeValues(data);
+          if (updateData)
           {
             updateData(data);
+             
           }
-          parseTimeValues(data);
 
-          // todo change - super dirty caches first graf data load...
+
+          loadGraph();
+          
           if(!updateData){
             rawData = data;
-            createSlider();
-          }
-
-          // todo: update will break it :)
-          if(loaded) {
-            redraw()
-          } else {
-            loadGraph();
+            createSlider(false);
           }
       });
   }
+  
+  function loadCurrentData()
+  {
+      jsonWithRetry("https://ps4ez07vul.execute-api.eu-west-1.amazonaws.com/v1/brexit/graph-latest", 3, function(json) {
+          
+          if (updateData)
+          {
+            updateData(json);
+            json.remain *= 12;
+            json.leave *= 12;
+          }
+          
+          var newDate = moment(json.time[0]).add(1, 'hours')._d;
+          
+          if (newDate.getTime() !== data.time[length -1].getTime())
+          {
+             data.time.push(newDate);
+             data.leave.push(data.leave[length -1]);
+             data.remain.push(data.remain[length -1]);             
+          }
+                 
+            d3.select(containerGraph1).transition();
+            d3.select(containerGraph2).transition();
+            
+            //updateDomain();
+            
+            updatePosition();
+            redraw()
+            
+            if (!updateData)
+            {
+              createSlider(true);
+            }           
+      });
+  }
 
-  //setInterval(loadPastData, 1800000);
-
+  setInterval(loadCurrentData, 2000);  
+  
   function parseTimeValues()
   {
+     var midnight = new Date(2016, 5, 23, 0, 0, 0, 0);
       data.time.forEach(function(element, i, arr) {
-          arr[i] = moment(element).add(2, 'hours')._d; // convert from UTC - to UK summer + hour interval start -> interval end
-      });
+          arr[i] = moment(element).add(1, 'hours')._d; // convert from UTC - to UK summer + hour interval start -> interval end
+          if(arr[i] >= midnight){
+            data.remain[i] *= 12;
+            data.leave[i] *= 12;
+          }
+      });  
   }
 }
 
@@ -360,7 +411,7 @@ function updateToPercentage(data)
 }
 
 
-function createSlider(){
+function createSlider(updateOnly){
 
    var remain = rawData.remain[rawData.remain.length - 1];
    var leave = rawData.leave[rawData.leave.length - 1];
@@ -368,36 +419,37 @@ function createSlider(){
    var remainP = Math.round(remain / (remain + leave) * 100);
    var leaveP =  Math.round(leave / (remain + leave) * 100);
 
-   var container = d3.select('.slider-chart');
-   var slider = container.append('div')
-      .attr('class', 'slider')
+    if (updateOnly === false)
+    {
+      var container = d3.select('.slider-chart');
+      var slider = container.append('div')
+          .attr('class', 'slider')
 
-  slider.append('div')
-      .attr('class', 'slider-remain')
-      .style('width', remainP + '%')
-      .text(remainP + '%')
+      slider.append('div')
+          .attr('class', 'slider-remain')
+          .style('width', remainP + '%')
+          .text(remainP + '%')
 
-  slider.append('div')
-      .attr('class', 'slider-leave')
-      .style('width', leaveP + '%')
-      .text(leaveP + '%')
+      slider.append('div')
+          .attr('class', 'slider-leave')
+          .style('width', leaveP + '%')
+          .text(leaveP + '%')
 
-  container.append('div')
-    .attr('class', 'slider-time')
-    .text(moment(rawData.time[rawData.time.length -1]).format('MMMM Do YYYY, h:mm'))
+      container.append('div')
+        .attr('class', 'slider-time')
+        .text(moment(rawData.time[rawData.time.length -1]).format('MMMM Do YYYY, h:mm'))
+    }
+    else
+    {
+      d3.select('.slider-remain')
+        .style('width', remainP + '%')
+        .text(remainP + '%');
+      
+      d3.select('.slider-leave')
+        .style('width', leaveP + '%')
+        .text(leaveP + '%');
 
+      
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 })();
