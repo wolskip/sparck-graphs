@@ -375,8 +375,8 @@ function drawGraph(containerGraph, updateData, tickFormat)
           if (updateData)
           {
             updateData(json);
-            json.remain *= 12;
-            json.leave *= 12;
+            //json.remain *= 12;
+            //json.leave *= 12;
           }
           
           var newDate = moment(json.time[0]).add(1, 'hours')._d;
@@ -410,10 +410,10 @@ function drawGraph(containerGraph, updateData, tickFormat)
      var midnight = new Date(2016, 5, 23, 0, 0, 0, 0);
       data.time.forEach(function(element, i, arr) {
           arr[i] = moment(element).add(1, 'hours')._d; // convert from UTC - to UK summer + hour interval start -> interval end
-          if(arr[i] >= midnight){
-            data.remain[i] *= 12;
-            data.leave[i] *= 12;
-          }
+          // if(arr[i] >= midnight){
+          //   data.remain[i] *= 12;
+          //   data.leave[i] *= 12;
+          // }
       });  
   }
 }
