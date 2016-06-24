@@ -116,7 +116,7 @@ function drawGraph(containerGraph, updateData, tickFormat)
       var minDate = new Date(maxDate);
       minDate.setDate(minDate.getDate() - 3);
       
-      x.domain([minDate, maxDate]);      
+      x.domain([minDate, moment(maxDate).add(1, "hours")._d]);      
       
       y.domain([d3.min([d3.min(data.remain), d3.min(data.leave)]) - 4, maxYValue + 4]);
   }
@@ -235,7 +235,7 @@ function drawGraph(containerGraph, updateData, tickFormat)
             while(data.time[index] && dataX.getTime() > data.time[index].getTime()){
               index ++
             } 
-            index --;
+            //index --;
             
            if(index < 0 || index > length -1){
              focusGroup.style("display", "none");
