@@ -235,7 +235,7 @@ function drawGraph(containerGraph, updateData, tickFormat)
             while(data.time[index] && dataX.getTime() > data.time[index].getTime()){
               index ++
             } 
-            //index --;
+            index --;
             
            if(index < 0 || index > length -1){
              focusGroup.style("display", "none");
