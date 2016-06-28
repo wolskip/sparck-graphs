@@ -247,7 +247,7 @@ function drawGraph(containerGraph, updateData, tickFormat)
            .on("mouseover", function() { focusGroup.style("display", null);})
            .on("mouseout", function() { focusGroup.style("display", "none");})
            .on("mousemove", mousemove)
-           .call(zoom.scaleExtent([0.2, 10]).on("zoom", mousezoom))
+           .call(zoom.scaleExtent([1, 10]).on("zoom", mousezoom))
            .on("mousewheel.zoom", mousezoom);
 
          function mousemove() {
@@ -303,16 +303,20 @@ function drawGraph(containerGraph, updateData, tickFormat)
   
   function updatePosition(){
     
-   var currentTranstate = zoom.translate();
+    var minDate = d3.min(data.time);
+    var maxDate = d3.max(data.time);
 
-    var length = x(minDate)-  x(maxDate);
+
+    var length = x(maxDate)-  x(minDate);
     var min = -(length - width);
     //console.log("min",min, length);
     //console.log("currentTranstate", currentTranstate[0])
+    var currentTranstate = zoom.translate();
 
     if(currentTranstate[0] > 0){
       zoom.translate([0, currentTranstate[1]]);
     }
+
 
     if(currentTranstate[0] < min){
         zoom.translate([min, currentTranstate[1]]);
