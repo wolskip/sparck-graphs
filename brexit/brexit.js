@@ -2,7 +2,22 @@
   var containerGraph1 = '.count-chart';
   var containerGraph2 = '.percentage-chart';
   var labels = [
-  ];
+      {
+        "start": new Date(2016, 5, 19, 0, 0, 0, 0),
+        "end": new Date(2016, 5, 22, 23, 0, 0, 0),
+        "title": "Expectations were high, but sentiment dropped after the event started."      
+      },
+      {
+        "start": new Date(2016, 5, 23, 0, 0, 0, 0),
+        "end": new Date(2016, 5, 23, 23, 0, 0, 0),
+        "title": "TVOS just didn’t go down well."
+      },
+      {
+        "start": new Date(2016, 5, 24, 0, 0, 0, 0),
+        "end": new Date(2016, 5, 24, 23, 0, 0, 0),
+        "title": "TVOS just didn’t go down well."
+      }   
+    ];
 
   function jsonWithRetry(url, retries, success){
     var load = function(){
@@ -29,6 +44,9 @@ var rawData;
 
 function drawGraph(containerGraph, updateData, tickFormat)
 {
+  var start = new Date(2016, 5, 15, 0, 0, 0, 0);
+  var end = new Date(2016, 5, 25, 1, 0, 0, 0);
+
   var loaded;
 
   // Set the dimensions of the canvas / graph
@@ -90,13 +108,17 @@ function drawGraph(containerGraph, updateData, tickFormat)
         .attr("width", width)
         .attr("height", height);
 
+    var desc = d3.select(containerGraph)
 
-  var desc = d3.select(containerGraph);
-  // .append("div")
-  //   .attr("class", "graph-description");
-  //
-  //   desc.append("h4");
-  //   desc.append("p");
+    if (updateData)
+    {
+      desc.append("div")
+        .attr("class", "percentage-chart-label")
+
+      var div = d3.select('.percentage-chart-label');
+        
+        div.append("h4");
+    }  
 
   var data;
   var zoom = d3.behavior.zoom();
@@ -113,12 +135,12 @@ function drawGraph(containerGraph, updateData, tickFormat)
       maxYValue = d3.max([d3.max(data.remain), d3.max(data.leave)]);
 
       // Scale the range of the data      
-      var minDate = new Date(maxDate);
-      minDate.setDate(minDate.getDate() - 3);
+      var minDate = new Date(minDate);
+      minDate.setDate(minDate.getDate());
       
       x.domain([minDate, moment(maxDate).add(1, "hours")._d]);      
       
-      y.domain([d3.min([d3.min(data.remain), d3.min(data.leave)]) - 4, maxYValue + 4]);
+      y.domain([d3.min([d3.min(data.remain), d3.min(data.leave)]), maxYValue]);
   }
   
   
@@ -157,27 +179,29 @@ function drawGraph(containerGraph, updateData, tickFormat)
               .attr("clip-path", "url(#clip-all-brexit)")
               .attr("d", valueline(data.leave));
 
-        // labelElements  = svg.selectAll(".graph-label").data(labels);
-        // var labelGroups = labelElements.enter()
-        //   .append("g")
-        //     .attr("class", "label-group")
-        //     .attr("clip-path", "url(#clip-all-brexit)");
+         labelElements  = svg.selectAll(".percentage-chart-label").data(labels);
+        var labelGroups = labelElements.enter()
+          .append("g")
+            .attr("class", "label-group")
+            .attr("clip-path", "url(#clip-all-brexit)");
 
-        // labelGroups.append("path")
-        //       .attr("class", "label-left")
-        //       .attr("clip-path", "url(#clip-all-brexit)")
-        //       .attr("d", line([[0,0], [0,height]]));
-        // labelGroups.append("path")
-        //       .attr("class", "label-right")
-        //       .attr("clip-path", "url(#clip-all-brexit)")
-        //       .attr("d", line([[0,0], [0,height]]));
-        // labelGroups.append("path")
-        //       .attr("class", "label-bottom")
-        //       .attr("clip-path", "url(#clip-all-brexit)")
-        //       .attr("d", line([[0,0], [0,0]]));
+        labelGroups.append("path")
+              .attr("class", "label-left")
+              .attr("clip-path", "url(#clip-all-brexit)")
+              .attr("d", line([[0,0], [0,height]]));
+        labelGroups.append("path")
+              .attr("class", "label-right")
+              .attr("clip-path", "url(#clip-all-brexit)")
+              .attr("d", line([[0,0], [0,height]]));
+        labelGroups.append("path")
+              .attr("class", "brexit-label-bottom")
+              .attr("clip-path", "url(#clip-all-brexit)")
+              .attr("d", line([[0,0], [0,0]]));
 
-        //updateLabels();
-
+        if(updateData){
+            updateLabels();
+        } 
+        
         // Add the X Axis
         svg.append("g")
             .attr("class", "x axis")
@@ -262,12 +286,11 @@ function drawGraph(containerGraph, updateData, tickFormat)
              focusCircleLeave.attr("transform", "translate(" + circleX + "," + circleYLeave  + ")");
            }
 
-            // var activeLabel = labels.filter(function(label){
-            //   return  label.start < dataX && dataX < label.end
-            // })[0];
+            var activeLabel = labels.filter(function(label){
+              return  label.start < dataX && dataX < label.end
+            })[0];
 
-            // desc.selectAll("h4").text(activeLabel ? activeLabel.title : "");
-            // desc.selectAll("p").text(activeLabel? activeLabel.text : "");
+            desc.selectAll("h4").text(activeLabel ? activeLabel.title : "");
          }
 
          function mousezoom(){
@@ -279,25 +302,20 @@ function drawGraph(containerGraph, updateData, tickFormat)
   
   function updatePosition(){
     
-    minDate = d3.min(data.time);
-    maxDate = d3.max(data.time);
-    
-    var minDate = new Date(maxDate);
-    minDate.setDate(minDate.getDate() - 3);
-    
-    var currentTranstate = zoom.translate();
+   var currentTranstate = zoom.translate();
 
-    var length = x(maxDate)-  x(minDate);
+    var length = x(minDate)-  x(maxDate);
     var min = -(length - width);
     //console.log("min",min, length);
     //console.log("currentTranstate", currentTranstate[0])
 
-    // if(currentTranstate[0] > 0){
-    //   zoom.translate([0, currentTranstate[1]]);
-    // }
+    if(currentTranstate[0] > 0){
+      zoom.translate([0, currentTranstate[1]]);
+    }
 
-    //if(currentTranstate[0] < min){
-    zoom.translate([min, currentTranstate[1]]);
+    if(currentTranstate[0] < min){
+        zoom.translate([min, currentTranstate[1]]);
+    }    
   }
   
   function indexOfDate(myArray, searchDate) {
@@ -317,7 +335,9 @@ function drawGraph(containerGraph, updateData, tickFormat)
     svg.select(".y.axis").call(yAxis);
     svg.select(".x.axis").call(xAxis);
 
-    //updateLabels();
+    if(updateData){
+        updateLabels();
+    }
   }
 
   function getDateX(date){
@@ -338,7 +358,7 @@ function drawGraph(containerGraph, updateData, tickFormat)
           return line([[start,0], [start,height-4]])
        });
 
-     labelElements.selectAll(".label-bottom")
+     labelElements.selectAll(".brexit-label-bottom")
        .attr("d", function(data){
          return line([[getDateX(data.start),height-4], [ getDateX(data.end),height-4]])
        });
@@ -351,70 +371,40 @@ function drawGraph(containerGraph, updateData, tickFormat)
           
           data = json;
          
-          parseTimeValues(data);
+          updateDataSet(data);
           if (updateData)
           {
-            updateData(data);
-             
-          }
+            updateData(data); 
 
+            var resultsIndex =  indexOfDate(data.time, new Date(2016, 5, 23, 1, 0, 0, 0));
+            createSlider(resultsIndex);         
+          }
 
           loadGraph();
           
           if(!updateData){
-            rawData = data;
-            createSlider(false);
+            rawData = data;        
           }
       });
   }
   
-  function loadCurrentData()
-  {
-      jsonWithRetry("https://ps4ez07vul.execute-api.eu-west-1.amazonaws.com/v1/brexit/graph-latest", 3, function(json) {
-          
-          if (updateData)
-          {
-            updateData(json);
-            //json.remain *= 12;
-            //json.leave *= 12;
-          }
-          
-          var newDate = moment(json.time[0]).add(1, 'hours')._d;
-          
-          if (newDate.getTime() !== data.time[length -1].getTime())
-          {
-             data.time.push(newDate);
-             data.leave.push(data.leave[length -1]);
-             data.remain.push(data.remain[length -1]);             
-          }
-                 
-            d3.select(containerGraph1).transition();
-            d3.select(containerGraph2).transition();
-            
-            //updateDomain();
-            
-            updatePosition();
-            redraw()
-            
-            if (!updateData)
-            {
-              createSlider(true);
-            }           
-      });
-  }
-
-  setInterval(loadCurrentData, 60000);  
-  
-  function parseTimeValues()
-  {
-     var midnight = new Date(2016, 5, 23, 0, 0, 0, 0);
+  function updateDataSet()
+  {     
       data.time.forEach(function(element, i, arr) {
           arr[i] = moment(element).add(1, 'hours')._d; // convert from UTC - to UK summer + hour interval start -> interval end
-          // if(arr[i] >= midnight){
-          //   data.remain[i] *= 12;
-          //   data.leave[i] *= 12;
-          // }
       });  
+
+      var startIndex = indexOfDate(data.time, start);
+      data.time = data.time.splice(startIndex, data.time.length);
+
+      var endIndex = indexOfDate(data.time, end);
+      data.time.splice(endIndex, data.time.length - endIndex);
+
+      data.remain = data.remain.splice(startIndex, data.remain.length);
+      data.remain.splice(endIndex, data.remain.length - endIndex);
+
+      data.leave = data.leave.splice(startIndex, data.leave.length);
+      data.leave.splice(endIndex, data.leave.length - endIndex);
   }
 }
 
@@ -428,46 +418,31 @@ function updateToPercentage(data)
 }
 
 
-function createSlider(updateOnly){
+function createSlider(index){
 
-   var remain = rawData.remain[rawData.remain.length - 1];
-   var leave = rawData.leave[rawData.leave.length - 1];
+   var remain = rawData.remain[index];
+   var leave = rawData.leave[index];
 
-   var remainP = Math.round(remain / (remain + leave) * 100);
-   var leaveP =  Math.round(leave / (remain + leave) * 100);
+   var remainP = 48;
+   var leaveP =  52;
 
-    if (updateOnly === false)
-    {
-      var container = d3.select('.slider-chart');
-      var slider = container.append('div')
-          .attr('class', 'slider')
+    
+    var container = d3.select('.slider-chart');
+    var slider = container.append('div')
+        .attr('class', 'slider')
 
-      slider.append('div')
-          .attr('class', 'slider-remain')
-          .style('width', remainP + '%')
-          .text(remainP + '%')
-
-      slider.append('div')
-          .attr('class', 'slider-leave')
-          .style('width', leaveP + '%')
-          .text(leaveP + '%')
-
-      container.append('div')
-        .attr('class', 'slider-time')
-        .text(moment(rawData.time[rawData.time.length -1]).add(5, 'minutes').format('MMMM Do YYYY, H:mm'))
-    }
-    else
-    {
-      d3.select('.slider-remain')
+    slider.append('div')
+        .attr('class', 'slider-remain')
         .style('width', remainP + '%')
-        .text(remainP + '%');
-      
-      d3.select('.slider-leave')
+        .text(remainP + '%')
+
+    slider.append('div')
+        .attr('class', 'slider-leave')
         .style('width', leaveP + '%')
-        .text(leaveP + '%');
-        
-        d3.select('.slider-time')
-         .text(moment(rawData.time[rawData.time.length -1]).add(5, 'minutes').format('MMMM Do YYYY, H:mm'))
-    }
+        .text(leaveP + '%')
+
+    container.append('div')
+      .attr('class', 'slider-time')
+      .text(moment(rawData.time[rawData.time.length -1]).add(5, 'minutes').format('MMMM Do YYYY, H:mm'))
 }
 })();
