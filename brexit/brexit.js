@@ -5,19 +5,20 @@
       {
         "start": new Date(2016, 5, 19, 0, 0, 0, 0),
         "end": new Date(2016, 5, 22, 23, 0, 0, 0),
-        "title": "Expectations were high, but sentiment dropped after the event started."      
+        "title": " In the run-up to polling day, Leave had a big lead, which shrunk as the actual day loomed."      
       },
       {
         "start": new Date(2016, 5, 23, 0, 0, 0, 0),
         "end": new Date(2016, 5, 23, 23, 0, 0, 0),
-        "title": "TVOS just didn’t go down well."
+        "title": "Polling day was turbulent, with both campaigns neck and neck."
       },
       {
         "start": new Date(2016, 5, 24, 0, 0, 0, 0),
         "end": new Date(2016, 5, 24, 23, 0, 0, 0),
-        "title": "TVOS just didn’t go down well."
+        "title": "The day after polling day saw a significant boost for Leave as the results became clear."
       }   
     ];
+
 
   function jsonWithRetry(url, retries, success){
     var load = function(){
@@ -117,7 +118,7 @@ function drawGraph(containerGraph, updateData, tickFormat)
 
       var div = d3.select('.percentage-chart-label');
         
-        div.append("h4");
+        div.append("p");
     }  
 
   var data;
@@ -443,6 +444,6 @@ function createSlider(index){
 
     container.append('div')
       .attr('class', 'slider-time')
-      .text(moment(new Date(2016, 5, 23, 0, 0, 0, 0).format('MMMM Do YYYY'))
+      .text(moment(new Date(2016, 5, 23, 0, 0, 0, 0).format('MMMM Do YYYY')))
 }
 })();
