@@ -291,7 +291,7 @@ function drawGraph(containerGraph, updateData, tickFormat)
               return  label.start < dataX && dataX < label.end
             })[0];
 
-            desc.selectAll("h4").text(activeLabel ? activeLabel.title : "");
+            desc.selectAll("p").text(activeLabel ? activeLabel.title : "");
          }
 
          function mousezoom(){
