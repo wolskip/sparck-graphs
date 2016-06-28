@@ -421,9 +421,6 @@ function updateToPercentage(data)
 
 function createSlider(index){
 
-   var remain = rawData.remain[index];
-   var leave = rawData.leave[index];
-
    var remainP = 48;
    var leaveP =  52;
 
