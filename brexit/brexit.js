@@ -443,6 +443,6 @@ function createSlider(index){
 
     container.append('div')
       .attr('class', 'slider-time')
-      .text(moment(rawData.time[rawData.time.length -1]).add(5, 'minutes').format('MMMM Do YYYY, H:mm'))
+      .text(moment(new Date(2016, 5, 23, 0, 0, 0, 0).format('MMMM Do YYYY'))
 }
 })();
