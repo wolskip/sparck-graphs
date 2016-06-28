@@ -441,6 +441,6 @@ function createSlider(index){
 
     container.append('div')
       .attr('class', 'slider-time')
-      .text(moment(new Date(2016, 5, 23, 0, 0, 0, 0).format('MMMM Do YYYY')))
+      .text(moment(new Date(2016, 5, 23, 0, 0, 0, 0)).format('MMMM Do YYYY'))
 }
 })();
