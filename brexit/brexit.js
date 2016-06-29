@@ -372,7 +372,7 @@ function drawGraph(containerGraph, updateData, tickFormat)
   loadPastData();
   function loadPastData()
   {
-      jsonWithRetry("https://ps4ez07vul.execute-api.eu-west-1.amazonaws.com/v1/brexit/graph2", 3, function(json) {
+      jsonWithRetry("https://ps4ez07vul.execute-api.eu-west-1.amazonaws.com/v1/brexit/static-graph-data", 3, function(json) {
           
           data = json;
          
@@ -397,19 +397,7 @@ function drawGraph(containerGraph, updateData, tickFormat)
   {     
       data.time.forEach(function(element, i, arr) {
           arr[i] = moment(element).add(1, 'hours')._d; // convert from UTC - to UK summer + hour interval start -> interval end
-      });  
-
-      var startIndex = indexOfDate(data.time, start);
-      data.time = data.time.splice(startIndex, data.time.length);
-
-      var endIndex = indexOfDate(data.time, end);
-      data.time.splice(endIndex, data.time.length - endIndex);
-
-      data.remain = data.remain.splice(startIndex, data.remain.length);
-      data.remain.splice(endIndex, data.remain.length - endIndex);
-
-      data.leave = data.leave.splice(startIndex, data.leave.length);
-      data.leave.splice(endIndex, data.leave.length - endIndex);
+      }); 
   }
 }
 
