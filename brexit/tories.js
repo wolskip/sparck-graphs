@@ -6,7 +6,7 @@
             d3.json(url, function(error, json) {
                 error = error || json.errorMessage;
                 retries--;
-                
+
                 if (error) {
                     console.log(error);
                     if (retries > 0) {
@@ -17,12 +17,12 @@
                 }
             });
         };
-        
+
         load();
     }
-    
+
     drawGraph(graphContainer, null, function(n) { return n + "%"; });
-    
+
 //    var containerGraph1 = '.count-chart';
 //    var containerGraph2 = '.percentage-chart';
 //
@@ -104,7 +104,7 @@
                 .attr("class", "percentage-chart-label");
 
             var div = d3.select('.percentage-chart-label');
-        
+
             div.append("p");
         }
 
@@ -117,29 +117,30 @@
             minDate = d3.min(data.time);
             maxDate = d3.max(data.time);
 
-            length = data.time.length;      
+            length = data.time.length;
 
             maxYValue = 0;
-            
+
             keys.forEach(function(element, i, arr) {
                 var maxBalance = d3.max(data[element].balance);
                 if (maxBalance > maxYValue) {
                     maxYValue = maxBalance;
                 }
             })
-            
+
 //            maxYValue = d3.max([d3.max(data.smith_tweets.balance), d3.max(data.corbyn_tweets.balance)]);
 
-            // Scale the range of the data      
+            // Scale the range of the data
             var minDate = new Date(minDate);
             minDate.setDate(minDate.getDate());
 
-            x.domain([minDate, moment(maxDate).add(1, "hours")._d]);      
+            //x.domain([minDate, moment(maxDate).add(1, "hours")._d]);
+            x.domain([minDate, maxDate]);
 
-            y.domain([d3.min([d3.min(data[keys[0]].balance), d3.min(data[keys[1]].balance)]), maxYValue]);
+            y.domain([d3.min([d3.min(data[keys[0]].balance), d3.min(data[keys[1]].balance)]) - 1 , maxYValue + 1]);
         }
-  
-  
+
+
         function loadGraph() {
             loaded = true;
 
@@ -192,10 +193,10 @@
 //                .attr("clip-path", "url(#clip-all-brexit)")
 //                .attr("d", line([[0,0], [0,0]]));
 //
-//            if (updateData) {
-//                updateLabels();
-//            } 
-        
+           if (updateData) {
+               updateLabels();
+           }
+
             // Add the X Axis
             svg.append("g")
                 .attr("class", "x axis")
@@ -218,7 +219,7 @@
 
             var focusLabelRemain = focusCircleRemain
                 .append("text")
-                .attr("class", "focus-label-remain")
+                .attr("class", "focus-label-smith")
                 .attr("dx", 5)
                 .attr("dy",-5)
                 .text("");
@@ -228,7 +229,7 @@
 
             var focusLabelLeave = focusCircleLeave
                 .append("text")
-                .attr("class", "focus-label-leave")
+                .attr("class", "focus-label-corbyn")
                 .attr("dx", 5)
                 .attr("dy",-5)
                 .text("");
@@ -246,13 +247,16 @@
             function mousemove() {
                 var mouseX = d3.mouse(this)[0]
                 var dataX = x.invert(mouseX);
-            
+
                 index = 0;
-                while (data.time[index] && dataX.getTime() > data.time[index].getTime()) {
+                while (data.corbyn_tweets.time[index] && dataX.getTime() > data.corbyn_tweets.time[index].getTime()) {
                     index ++
                 }
-
                 index --;
+
+                dataX = data.corbyn_tweets.time[index] || dataX;
+
+
 
                 if (index < 0 || index > length -1) {
                     focusGroup.style("display", "none");
@@ -260,7 +264,7 @@
                     focusGroup.style("display", null);
                     var circleX = x(dataX);
 
-                    var compare = data.corbyn_tweets.balance[dataX] > data.smith_tweets.balance[dataX];
+                    //var compare = data.corbyn_tweets.balance[dataX] > data.smith_tweets.balance[dataX];
                     var topPosition = y(d3.max([d3.max(data.corbyn_tweets.balance), d3.max(data.smith_tweets.balance)]));
                     var bottomPosition = topPosition + 30;
 
@@ -291,9 +295,9 @@
                 redraw();
             }
         }
-  
+
         function updatePosition() {
-    
+
             var minDate = d3.min(data.time);
             var maxDate = d3.max(data.time);
 
@@ -311,9 +315,9 @@
 
             if (currentTranstate[0] < min) {
                 zoom.translate([min, currentTranstate[1]]);
-            }    
+            }
         }
-  
+
         function indexOfDate(myArray, searchDate) {
             for(var i = 0, len = myArray.length; i < len; i++) {
                 if (myArray[i].toString() === searchDate.toString()) return i;
@@ -322,10 +326,10 @@
         }
 
         function redraw() {
-    
+
             // Add the valueline path.
-            svg.select(".line-leave").attr("d", valueline(data.corbyn_tweets.balance));
-            svg.select(".line-remain").attr("d", valueline(data.smith_tweets.balance));
+            svg.select(".line-corbyn").attr("d", valueline(data.corbyn_tweets.balance));
+            svg.select(".line-smith").attr("d", valueline(data.smith_tweets.balance));
 
             // Add the Y Axis
             svg.select(".y.axis").call(yAxis);
@@ -341,22 +345,22 @@
         }
 
         function updateLabels() {
-            labelElements.selectAll(".label-left")
-                .attr("d", function(data) {
-                    var start = getDateX(data.start);
-                    return line([[start,0], [start,height-4]])
-                });
-
-            labelElements.selectAll(".label-right")
-                .attr("d", function(data){
-                    var start = getDateX(data.end);
-                    return line([[start,0], [start,height-4]])
-                });
-
-            labelElements.selectAll(".brexit-label-bottom")
-                .attr("d", function(data){
-                    return line([[getDateX(data.start),height-4], [ getDateX(data.end),height-4]])
-                });
+            // labelElements.selectAll(".label-left")
+            //     .attr("d", function(data) {
+            //         var start = getDateX(data.start);
+            //         return line([[start,0], [start,height-4]])
+            //     });
+            //
+            // labelElements.selectAll(".label-right")
+            //     .attr("d", function(data){
+            //         var start = getDateX(data.end);
+            //         return line([[start,0], [start,height-4]])
+            //     });
+            //
+            // labelElements.selectAll(".brexit-label-bottom")
+            //     .attr("d", function(data){
+            //         return line([[getDateX(data.start),height-4], [ getDateX(data.end),height-4]])
+            //     });
         }
 
         loadPastData();
@@ -365,17 +369,17 @@
             jsonWithRetry("http://37.26.94.90/response.json", 0, function(json) {
                 console.log("Fetching data");
                 data = json;
-                
+
                 console.log(data)
-                
+
                 // use the first time array as the base for the whole graph
                 keys = Object.keys(data)
                 data.time = data[keys[0]].time
-                
+
                 updateDataSet(data);
 
                 if (updateData) {
-                    updateData(data); 
+                    updateData(data);
 
                     var resultsIndex =  indexOfDate(data.time, new Date(2016, 5, 23, 1, 0, 0, 0));
                     createSlider(resultsIndex);
@@ -384,15 +388,22 @@
                 loadGraph();
 
                 if (!updateData) {
-                    rawData = data;        
+                    rawData = data;
                 }
             });
         }
-  
+
         function updateDataSet(data) {
+            var toPercentage = function(array){
+              return array.map(function(i) {return i *100 })
+            }
+
+            data.corbyn_tweets.balance = toPercentage(data.corbyn_tweets.balance)
+            data.smith_tweets.balance = toPercentage(data.smith_tweets.balance)
+
             data.time.forEach(function(element, i, arr) {
-                    arr[i] = moment(element).add(1, 'hours')._d; // convert from UTC - to UK summer + hour interval start -> interval end    
-                });
+                arr[i] = moment(element).add(1, 'hours')._d; // convert from UTC - to UK summer + hour interval start -> interval end
+            });
         }
     }
 
@@ -402,5 +413,5 @@
             data.smith_tweets.balance[i] = 100 - data.corbyn_tweets.balance[i];
         }
     }
-    
+
 })();
