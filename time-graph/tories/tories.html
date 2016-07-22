@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style> /* set the CSS */
+
+path {
+    stroke-width: 2;
+    fill: none;
+}
+.axis path,
+.axis line {
+    fill: none;
+    stroke: grey;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
+.x.axis .domain {
+    stroke: transparent;
+}
+.xaxisbrexit {
+    stroke: grey;
+}
+.line-smith {
+   stroke: #1a84ec;
+}
+.line-corbyn {
+   stroke: #FF0000;
+}
+.line-vals-average {
+    stroke: black;
+}
+.graph-overlay {
+  fill: transparent
+}
+.focus-line {
+  stroke-width: 1;
+  stroke: #999;
+}
+
+svg {
+    font-family: 'Oswald';
+    font-size: 16px;
+}
+.focus-label-corbyn {
+  fill: red;
+}
+.focus-label-smith {
+  fill: #1a84ec;
+}
+
+
+</style>
+
+<body>
+    <div class="tory-chart"></div>
+<!--
+    <div class="live-chart"></div>
+    <div class="count-chart"></div>
+    <div class="percentage-chart"></div>
+    <div class="slider-chart"></div>
+-->
+
+    <!-- load the d3.js library -->
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/momentjs/2.13.0/moment.min.js"></script>
+    <script type="text/javascript" src="../index.js"></script>
+    <script type="text/javascript" src="./tories.js"></script>
+</body>
