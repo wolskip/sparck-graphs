@@ -1,13 +1,12 @@
-
 declare var d3:any;
 
 interface TimeValue
 {
-    time: Date,
+    date: Date,
     value: number
 }
 
-interface Line{
+interface DataLine{
     color: string,
     data: TimeValue[]
 }
@@ -65,7 +64,7 @@ class TimeGraph {
 
     constructor(
         private elementSelector: string,
-        private lines: Line[]
+        private lines: DataLine[]
     ){
         this.render();
     }
@@ -122,14 +121,17 @@ class TimeGraph {
             .attr("class", "y axis")
             .call(this.yAxis);
 
-
-        this.svg.append("rect")
+        var self = this;
+        var overlay = this.svg.append("rect")
             .attr("class", "graph-overlay")
             .attr("width", this.width)
             .attr("height", this.height)
             //.on("mouseover", function() { focusGroup.style("display", null);})
             //.on("mouseout", function() { focusGroup.style("display", "none");})
-            //.on("mousemove", () => this.mousemove)
+            .on("mousemove", function() {
+
+                self.mousemove(d3.mouse(this))
+            })
             .call(this.zoom.scaleExtent([1, 10]).on("zoom", this.mousezoom.bind(this)))
             .on("mousewheel.zoom", this.mousezoom.bind(this));
 
@@ -174,12 +176,19 @@ class TimeGraph {
         this.update()
     }
 
+    mousemove([mouseX,mouseY]){
+        var values = this.lines.map(l => {
+            var point = this.getClosestScreenValue(l, mouseX)
+            console.log(point.date, point.value);
+        });
+    }
+
     updateDomain(){
         var allTImeValues = this.lines
             .map(l => l.data)
             .reduce((a,b) => a.concat(b));
 
-        var times = allTImeValues.map(i => i.time);
+        var times = allTImeValues.map(i => i.date);
         var values = allTImeValues.map(v => v.value)
 
         this.MaxDomainX = [d3.min(times), d3.max(times)];
@@ -191,7 +200,46 @@ class TimeGraph {
 
     valueline = d3.svg.line()
         .interpolate("monotone")
-        .x((v:TimeValue) => this.x(v.time))
+        .x((v:TimeValue) => this.x(v.date))
         .y((v:TimeValue) => this.y(v.value));
+
+    getClosestScreenValue(line: DataLine, xScreen){
+        var close = this.getClosePoints(line, xScreen);
+        if(! close.left || !close.right ){
+            return close.left || close.right;
+        }
+        return close.right.date.getTime() - close.exactX.getTime() < close.exactX.getTime() - close.left.date.getTime() ?
+            close.right : close.left;
+    }
+
+    getInterpolatedScreenValue(line:DataLine, xScreen){
+        var close = this.getClosePoints(line, xScreen);
+        return this.interpolate(close.left, close.right, close.exactX);
+    }
+
+    getClosePoints(line: DataLine, xScreen){
+        var xData = this.x.invert(xScreen);
+        var rightIndex = d3.bisector((i:TimeValue) => i.date).right(line.data, xData);
+
+        return {
+            left: line.data[rightIndex - 1],
+            right: line.data[rightIndex],
+            exactX: xData
+        }
+    }
+
+    interpolate(a:TimeValue, b: TimeValue, xData: Date){
+        if(! a || !b ){
+            return a || b;
+        }
+        var value = <number>d3.time.scale()
+            .domain([a.date, b.date])
+            .range([a.value, b.value]) (xData);
+
+        return {
+            value: value,
+            date: xData
+        }
+    }
 
 }

@@ -39,7 +39,7 @@ var TimeGraph = (function () {
         this.zoom = d3.behavior.zoom();
         this.valueline = d3.svg.line()
             .interpolate("monotone")
-            .x(function (v) { return _this.x(v.time); })
+            .x(function (v) { return _this.x(v.date); })
             .y(function (v) { return _this.y(v.value); });
         this.render();
     }
@@ -80,10 +80,14 @@ var TimeGraph = (function () {
         this.svg.append("g")
             .attr("class", "y axis")
             .call(this.yAxis);
-        this.svg.append("rect")
+        var self = this;
+        var overlay = this.svg.append("rect")
             .attr("class", "graph-overlay")
             .attr("width", this.width)
             .attr("height", this.height)
+            .on("mousemove", function () {
+            self.mousemove(d3.mouse(this));
+        })
             .call(this.zoom.scaleExtent([1, 10]).on("zoom", this.mousezoom.bind(this)))
             .on("mousewheel.zoom", this.mousezoom.bind(this));
         this.update();
@@ -115,16 +119,57 @@ var TimeGraph = (function () {
         }
         this.update();
     };
+    TimeGraph.prototype.mousemove = function (_a) {
+        var _this = this;
+        var mouseX = _a[0], mouseY = _a[1];
+        var values = this.lines.map(function (l) {
+            var point = _this.getClosestScreenValue(l, mouseX);
+            console.log(point.date, point.value);
+        });
+    };
     TimeGraph.prototype.updateDomain = function () {
         var allTImeValues = this.lines
             .map(function (l) { return l.data; })
             .reduce(function (a, b) { return a.concat(b); });
-        var times = allTImeValues.map(function (i) { return i.time; });
+        var times = allTImeValues.map(function (i) { return i.date; });
         var values = allTImeValues.map(function (v) { return v.value; });
         this.MaxDomainX = [d3.min(times), d3.max(times)];
         this.MaxDomainY = [d3.min(values), d3.max(values)];
         this.x.domain(this.MaxDomainX);
         this.y.domain(this.MaxDomainY);
+    };
+    TimeGraph.prototype.getClosestScreenValue = function (line, xScreen) {
+        var close = this.getClosePoints(line, xScreen);
+        if (!close.left || !close.right) {
+            return close.left || close.right;
+        }
+        return close.right.date.getTime() - close.exactX.getTime() < close.exactX.getTime() - close.left.date.getTime() ?
+            close.right : close.left;
+    };
+    TimeGraph.prototype.getInterpolatedScreenValue = function (line, xScreen) {
+        var close = this.getClosePoints(line, xScreen);
+        return this.interpolate(close.left, close.right, close.exactX);
+    };
+    TimeGraph.prototype.getClosePoints = function (line, xScreen) {
+        var xData = this.x.invert(xScreen);
+        var rightIndex = d3.bisector(function (i) { return i.date; }).right(line.data, xData);
+        return {
+            left: line.data[rightIndex - 1],
+            right: line.data[rightIndex],
+            exactX: xData
+        };
+    };
+    TimeGraph.prototype.interpolate = function (a, b, xData) {
+        if (!a || !b) {
+            return a || b;
+        }
+        var value = d3.time.scale()
+            .domain([a.date, b.date])
+            .range([a.value, b.value])(xData);
+        return {
+            value: value,
+            date: xData
+        };
     };
     return TimeGraph;
 }());

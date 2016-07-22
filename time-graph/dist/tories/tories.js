@@ -3,7 +3,7 @@ jsonWithRetry("http://37.26.94.90/response.json", 1, function (json) {
         return data.balance.map(function (v, i) {
             return {
                 value: v * 100,
-                time: moment(data.time[i]).add(1, 'hours')._d
+                date: moment(data.time[i]).add(1, 'hours')._d
             };
         });
     }
