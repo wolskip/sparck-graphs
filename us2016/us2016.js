@@ -39,7 +39,7 @@
   }
 
 drawGraph(containerGraph1);
-drawGraph(containerGraph2, updateToPercentage, function(n){ return n + "%"; });
+// drawGraph(containerGraph2, updateToPercentage, function(n){ return n + "%"; });
 drawGraph(containerGraph2, updateToTotal, function(n){ return n; });
 
 var rawData;
