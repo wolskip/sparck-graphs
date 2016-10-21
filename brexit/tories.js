@@ -367,7 +367,7 @@
         function loadPastData() {
 //            jsonWithRetry("http://tory-race.cf.skyscapecloud.com/tory", 0, function(json) {
 //            jsonWithRetry("http://37.26.94.90/response.json", 0, function(json) {
-             jsonWithRetry("http://sparck.s3-eu-west-1.amazonaws.com/response.json", 0, function(json) {            
+             jsonWithRetry("https://s3-eu-west-1.amazonaws.com/sparck/response.json", 0, function(json) {            
                 console.log("Fetching data");
                 data = json;
 
