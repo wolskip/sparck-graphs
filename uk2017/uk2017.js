@@ -6,20 +6,21 @@
 
   function jsonWithRetry(url, retries, success) {
     var load = function() {
-      d3.json(url, function(error, json) {
-        error = error || json.errorMessage;
-        retries--;
-        if (error) {
-          console.log(error);
-          if (retries > 0) {
-            load();
+        d3.json(url, function(error, json) {
+          error = error || json.errorMessage;
+          retries--;
+          if (error) {
+            console.log(error);
+            if (retries > 0) {
+              load();
+            }
+          } else {
+            success(json);
           }
-        } else {
-          success(json);
-        }
-      });
-    }
-    load();
+        });
+      }
+      // load();
+    success();
   }
 
   drawGraph(containerGraph1);
@@ -169,7 +170,7 @@
 
       if (tickFormat != undefined) {
         svg.append("path")
-          .attr("class", "xaxisbrexit")
+          .attr("class", "x-axis-election-2017")
           .style('stroke-width', thick)
           .attr("d", line([
             [0, y(50)],
@@ -178,7 +179,7 @@
       }
 
       svg.append("clipPath")
-        .attr("id", "clip-all-brexit")
+        .attr("id", "clip-all-election-2017")
         .append("rect")
         .attr("x", 0)
         .attr("y", 0)
@@ -187,48 +188,48 @@
 
       svg.append("path")
         .attr("class", "line-labour")
-        .attr("clip-path", "url(#clip-all-brexit)")
+        .attr("clip-path", "url(#clip-all-election-2017)")
         .attr("d", valueline(data.labour));
 
       svg.append("path")
         .attr("class", "line-tory")
-        .attr("clip-path", "url(#clip-all-brexit)")
+        .attr("clip-path", "url(#clip-all-election-2017)")
         .attr("d", valueline(data.tory));
 
 
       svg.append("path")
         .attr("class", "line-libDem")
-        .attr("clip-path", "url(#clip-all-brexit)")
+        .attr("clip-path", "url(#clip-all-election-2017)")
         .attr("d", valueline(data.libDem));
 
       svg.append("path")
         .attr("class", "line-snp")
-        .attr("clip-path", "url(#clip-all-brexit)")
+        .attr("clip-path", "url(#clip-all-election-2017)")
         .attr("d", valueline(data.snp));
 
       labelElements = svg.selectAll(".percentage-chart-label").data(labels);
       var labelGroups = labelElements.enter()
         .append("g")
         .attr("class", "label-group")
-        .attr("clip-path", "url(#clip-all-brexit)");
+        .attr("clip-path", "url(#clip-all-election-2017)");
 
       labelGroups.append("path")
         .attr("class", "label-left")
-        .attr("clip-path", "url(#clip-all-brexit)")
+        .attr("clip-path", "url(#clip-all-election-2017)")
         .attr("d", line([
           [0, 0],
           [0, height]
         ]));
       labelGroups.append("path")
         .attr("class", "label-right")
-        .attr("clip-path", "url(#clip-all-brexit)")
+        .attr("clip-path", "url(#clip-all-election-2017)")
         .attr("d", line([
           [0, 0],
           [0, height]
         ]));
       labelGroups.append("path")
-        .attr("class", "brexit-label-bottom")
-        .attr("clip-path", "url(#clip-all-brexit)")
+        .attr("class", "election-2017-label-bottom")
+        .attr("clip-path", "url(#clip-all-election-2017)")
         .attr("d", line([
           [0, 0],
           [0, 0]
@@ -301,27 +302,6 @@
         .attr("dy", -5)
         .text("");
 
-
-      // var focusCircleRemain = focusGroup.append("g");
-      // focusCircleRemain.append("circle").attr("r", 3);
-
-      // var focusLabelRemain = focusCircleRemain
-      //   .append("text")
-      //   .attr("class", "focus-label-remain")
-      //   .attr("dx", 5)
-      //   .attr("dy", -5)
-      //   .text("");
-      //
-      // var focusCircleLeave = focusGroup.append("g");
-      // focusCircleLeave.append("circle").attr("r", 3);
-      //
-      // var focusLabelLeave = focusCircleLeave
-      //   .append("text")
-      //   .attr("class", "focus-label-leave")
-      //   .attr("dx", 5)
-      //   .attr("dy", -5)
-      //   .text("");
-
       svg.append("rect")
         .attr("class", "graph-overlay")
         .attr("width", width)
@@ -354,6 +334,15 @@
           focusGroup.style("display", null);
           var circleX = x(dataX);
 
+          // var parties = [
+          //   {name:'labour', value: data.labour[dataX]},
+          //   {name:'tory', value: data.tory[dataX]},
+          //   {name:'libDem', value: data.libDem[dataX]},
+          //   {name:'snp', value: data.snp[dataX]}
+          // ];
+          // parties.sort(function(a,b){
+          //   return a.
+          // })
           // TODO: Order labels by number of tweets
           // var compare = x[dataX] > data.remain[dataX];
           // var topPosition = y(d3.max([d3.max(data.leave), d3.max(data.remain)]));
@@ -390,10 +379,11 @@
 
           focusLine.attr("transform", "translate(" + circleX + ",0)");
 
-          // focusCircleRemain.attr("transform", "translate(" + circleX + "," +
-          //   circleYRemain + ")");
-          // focusCircleLeave.attr("transform", "translate(" + circleX + "," +
-          //   circleYLeave + ")");
+          focusCircleLabour.attr("transform", "translate(" + circleX + ",0)")
+            .attr("cy", data.labour[index]);
+          focusCircleTory.attr("transform", "translate(" + circleX + ",0)");
+          focusCircleLibDem.attr("transform", "translate(" + circleX + ",0)");
+          focusCircleSNP.attr("transform", "translate(" + circleX + ",0)");
         }
 
         var activeLabel = labels.filter(function(label) {
@@ -480,7 +470,7 @@
           ])
         });
 
-      labelElements.selectAll(".brexit-label-bottom")
+      labelElements.selectAll(".election-2017-label-bottom")
         .attr("d", function(data) {
           return line([
             [getDateX(data.start), height - 4],
@@ -493,7 +483,7 @@
 
     function loadPastData() {
       jsonWithRetry(
-        "https://ps4ez07vul.execute-api.eu-west-1.amazonaws.com/v1/brexit/static-graph-data",
+        "https://ps4ez07vul.execute-api.eu-west-1.amazonaws.com/v1/election-2017/static-graph-data",
         3,
         function(json) {
 
@@ -523,7 +513,6 @@
 
             var resultsIndex = indexOfDate(data.time, new Date(2016, 5, 23,
               1, 0, 0, 0));
-            // createSlider(resultsIndex);
           }
 
           loadGraph();
@@ -543,8 +532,7 @@
 
   function updateToPercentage(data) {
     for (i = 0; i < data.labour.length; i++) {
-      var total = data.labour[i] + data.tory[i] + data.libDem[i] + data.tory[
-        i];
+      var total = data.labour[i] + data.tory[i] + data.libDem[i] + data.tory[i];
       data.labour[i] = 100 * data.labour[i] / total;
       data.tory[i] = 100 * data.tory[i] / total;
       data.libDem[i] = 100 * data.libDem[i] / total;
@@ -552,29 +540,4 @@
     }
   }
 
-  // TODO: update this
-  // function createSlider(index) {
-  //
-  //   var remainP = 48;
-  //   var leaveP = 52;
-  //
-  //
-  //   var container = d3.select('.slider-chart');
-  //   var slider = container.append('div')
-  //     .attr('class', 'slider')
-  //
-  //   slider.append('div')
-  //     .attr('class', 'slider-remain')
-  //     .style('width', remainP + '%')
-  //     .text(remainP + '%')
-  //
-  //   slider.append('div')
-  //     .attr('class', 'slider-leave')
-  //     .style('width', leaveP + '%')
-  //     .text(leaveP + '%')
-  //
-  //   container.append('div')
-  //     .attr('class', 'slider-time')
-  //     .text(moment(new Date(2016, 5, 23, 0, 0, 0, 0)).format('MMMM Do YYYY'))
-  // }
 })();
