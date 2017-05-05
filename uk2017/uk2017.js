@@ -1,24 +1,7 @@
 (function() {
   var containerGraph1 = '.count-chart';
   var containerGraph2 = '.percentage-chart';
-  var data = undefined; // Because I don't like globals
-  var labels = [
-    // {
-    //   "start": new Date(2016, 5, 19, 0, 0, 0, 0),
-    //   "end": new Date(2016, 5, 22, 23, 0, 0, 0),
-    //   "title": " In the run-up to polling day, Leave had a big lead, which shrunk as the actual day loomed."
-    // },
-    // {
-    //   "start": new Date(2016, 5, 23, 0, 0, 0, 0),
-    //   "end": new Date(2016, 5, 23, 23, 0, 0, 0),
-    //   "title": "Polling day was turbulent, with both campaigns neck and neck."
-    // },
-    // {
-    //   "start": new Date(2016, 5, 24, 0, 0, 0, 0),
-    //   "end": new Date(2016, 5, 24, 23, 0, 0, 0),
-    //   "title": "The day after polling day saw a significant boost for Leave as the results became clear."
-    // }
-  ];
+  var labels = [];
 
 
   function jsonWithRetry(url, retries, success) {
@@ -161,7 +144,8 @@
 
       length = data.time.length;
 
-      maxYValue = d3.max([d3.max(data.remain), d3.max(data.leave)]);
+      maxYValue = d3.max([d3.max(data.labour), d3.max(data.tory), d3.max(data
+        .libDem), d3.max(data.snp)]);
 
       // Scale the range of the data
       var minDate = new Date(minDate);
@@ -169,7 +153,9 @@
 
       x.domain([minDate, moment(maxDate).add(1, "hours")._d]);
 
-      y.domain([d3.min([d3.min(data.remain), d3.min(data.leave)]), maxYValue]);
+      y.domain([d3.min([d3.min(data.labour), d3.min(data.tory), d3.min(data.libDem),
+        d3.min(data.snp)
+      ]), maxYValue]);
     }
 
 
@@ -200,14 +186,25 @@
         .attr("height", height);
 
       svg.append("path")
-        .attr("class", "line-remain")
+        .attr("class", "line-labour")
         .attr("clip-path", "url(#clip-all-brexit)")
-        .attr("d", valueline(data.remain));
+        .attr("d", valueline(data.labour));
 
       svg.append("path")
-        .attr("class", "line-leave")
+        .attr("class", "line-tory")
         .attr("clip-path", "url(#clip-all-brexit)")
-        .attr("d", valueline(data.leave));
+        .attr("d", valueline(data.tory));
+
+
+      svg.append("path")
+        .attr("class", "line-libDem")
+        .attr("clip-path", "url(#clip-all-brexit)")
+        .attr("d", valueline(data.libDem));
+
+      svg.append("path")
+        .attr("class", "line-snp")
+        .attr("clip-path", "url(#clip-all-brexit)")
+        .attr("d", valueline(data.snp));
 
       labelElements = svg.selectAll(".percentage-chart-label").data(labels);
       var labelGroups = labelElements.enter()
@@ -261,25 +258,69 @@
           [0, height]
         ]));
 
-      var focusCircleRemain = focusGroup.append("g");
-      focusCircleRemain.append("circle").attr("r", 3);
+      var focusCircleLabour = focusGroup.append("g");
+      focusCircleLabour.append("circle").attr("r", 3);
 
-      var focusLabelRemain = focusCircleRemain
+      var focusLabelLabour = focusCircleLabour
         .append("text")
-        .attr("class", "focus-label-remain")
+        .attr("class", "focus-label-labour")
         .attr("dx", 5)
         .attr("dy", -5)
         .text("");
 
-      var focusCircleLeave = focusGroup.append("g");
-      focusCircleLeave.append("circle").attr("r", 3);
 
-      var focusLabelLeave = focusCircleLeave
+      var focusCircleTory = focusGroup.append("g");
+      focusCircleTory.append("circle").attr("r", 3);
+
+      var focusLabelTory = focusCircleTory
         .append("text")
-        .attr("class", "focus-label-leave")
+        .attr("class", "focus-label-tory")
         .attr("dx", 5)
         .attr("dy", -5)
         .text("");
+
+
+      var focusCircleLibDem = focusGroup.append("g");
+      focusCircleLibDem.append("circle").attr("r", 3);
+
+      var focusLabelLibDem = focusCircleLibDem
+        .append("text")
+        .attr("class", "focus-label-libDem")
+        .attr("dx", 5)
+        .attr("dy", -5)
+        .text("");
+
+
+      var focusCircleSNP = focusGroup.append("g");
+      focusCircleSNP.append("circle").attr("r", 3);
+
+      var focusLabelSNP = focusCircleSNP
+        .append("text")
+        .attr("class", "focus-label-snp")
+        .attr("dx", 5)
+        .attr("dy", -5)
+        .text("");
+
+
+      // var focusCircleRemain = focusGroup.append("g");
+      // focusCircleRemain.append("circle").attr("r", 3);
+
+      // var focusLabelRemain = focusCircleRemain
+      //   .append("text")
+      //   .attr("class", "focus-label-remain")
+      //   .attr("dx", 5)
+      //   .attr("dy", -5)
+      //   .text("");
+      //
+      // var focusCircleLeave = focusGroup.append("g");
+      // focusCircleLeave.append("circle").attr("r", 3);
+      //
+      // var focusLabelLeave = focusCircleLeave
+      //   .append("text")
+      //   .attr("class", "focus-label-leave")
+      //   .attr("dx", 5)
+      //   .attr("dy", -5)
+      //   .text("");
 
       svg.append("rect")
         .attr("class", "graph-overlay")
@@ -313,29 +354,46 @@
           focusGroup.style("display", null);
           var circleX = x(dataX);
 
-          var compare = data.leave[dataX] > data.remain[dataX];
-          var topPosition = y(d3.max([d3.max(data.leave), d3.max(data.remain)]));
-          var bottomPosition = topPosition + 30;
+          // TODO: Order labels by number of tweets
+          // var compare = x[dataX] > data.remain[dataX];
+          // var topPosition = y(d3.max([d3.max(data.leave), d3.max(data.remain)]));
+          // var bottomPosition = topPosition + 30;
+          //
+          // var circleYRemain = data.leave[dataX] > data.remain[dataX] ?
+          //   topPosition : bottomPosition;
+          // var circleYLeave = data.leave[dataX] <= data.remain[dataX] ?
+          //   bottomPosition : topPosition;
 
-          var circleYRemain = data.leave[dataX] > data.remain[dataX] ?
-            topPosition : bottomPosition;
-          var circleYLeave = data.leave[dataX] <= data.remain[dataX] ?
-            bottomPosition : topPosition;
+          // var textLeave = tickFormat != undefined ? tickFormat(Math.round(
+          //   data.leave[index])) : Math.round(data.leave[index]);
+          // focusLabelLeave.text(textLeave);
+          //
+          // var textRemain = tickFormat != undefined ? tickFormat(Math.round(
+          //   data.remain[index])) : Math.round(data.remain[index]);
+          // focusLabelRemain.text(textRemain);
 
-          var textLeave = tickFormat != undefined ? tickFormat(Math.round(
-            data.leave[index])) : Math.round(data.leave[index]);
-          focusLabelLeave.text(textLeave);
+          var textLabour = tickFormat != undefined ? tickFormat(Math.round(
+            data.labour[index])) : Math.round(data.labour[index]);
+          focusLabelLabour.text(textLabour);
 
-          var textRemain = tickFormat != undefined ? tickFormat(Math.round(
-            data.remain[index])) : Math.round(data.remain[index]);
-          focusLabelRemain.text(textRemain);
+          var textTory = tickFormat != undefined ? tickFormat(Math.round(
+            data.tory[index])) : Math.round(data.tory[index]);
+          focusLabelTory.text(textTory);
+
+          var textLibDem = tickFormat != undefined ? tickFormat(Math.round(
+            data.libDem[index])) : Math.round(data.libDem[index]);
+          focusLabelLibDem.text(textLibDem);
+
+          var textSNP = tickFormat != undefined ? tickFormat(Math.round(
+            data.snp[index])) : Math.round(data.snp[index]);
+          focusLabelSNP.text(textSNP);
 
           focusLine.attr("transform", "translate(" + circleX + ",0)");
 
-          focusCircleRemain.attr("transform", "translate(" + circleX + "," +
-            circleYRemain + ")");
-          focusCircleLeave.attr("transform", "translate(" + circleX + "," +
-            circleYLeave + ")");
+          // focusCircleRemain.attr("transform", "translate(" + circleX + "," +
+          //   circleYRemain + ")");
+          // focusCircleLeave.attr("transform", "translate(" + circleX + "," +
+          //   circleYLeave + ")");
         }
 
         var activeLabel = labels.filter(function(label) {
@@ -384,8 +442,10 @@
     function redraw() {
 
       // Add the valueline path.
-      svg.select(".line-leave").attr("d", valueline(data.leave));
-      svg.select(".line-remain").attr("d", valueline(data.remain));
+      svg.select(".line-labour").attr("d", valueline(data.labour));
+      svg.select(".line-tory").attr("d", valueline(data.tory));
+      svg.select(".line-libDem").attr("d", valueline(data.libDem));
+      svg.select(".line-snp").attr("d", valueline(data.snp));
 
       // Add the Y Axis
       svg.select(".y.axis").call(yAxis);
@@ -437,7 +497,25 @@
         3,
         function(json) {
 
-          data = json;
+          // data = json;
+          data = {
+            "labour": [1221.0, 724.0, 593.0, 499.0, 934.0, 2229.0, 3645.0,
+              4521.0, 4755.0
+            ],
+            "tory": [682.0, 352.0, 328.0, 299.0, 448.0, 983.0, 2203.0,
+              3039.0, 2795.0
+            ],
+            "libDem": [100, 200, 300, 400, 500, 600, 700, 800, 900],
+            "snp": [4000, 3500, 3000, 2500, 2000, 1500, 1000, 500, 0],
+            "time": ["2016-06-15 00:00:00", "2016-06-15 01:00:00",
+              "2016-06-15 02:00:00",
+              "2016-06-15 03:00:00", "2016-06-15 04:00:00",
+              "2016-06-15 05:00:00",
+              "2016-06-15 06:00:00", "2016-06-15 07:00:00",
+              "2016-06-15 08:00:00"
+            ]
+          };
+
 
           updateDataSet(data);
           if (updateData) {
@@ -445,7 +523,7 @@
 
             var resultsIndex = indexOfDate(data.time, new Date(2016, 5, 23,
               1, 0, 0, 0));
-            createSlider(resultsIndex);
+            // createSlider(resultsIndex);
           }
 
           loadGraph();
@@ -464,35 +542,39 @@
   }
 
   function updateToPercentage(data) {
-    for (i = 0; i < data.leave.length; i++) {
-      data.leave[i] = 100 * data.leave[i] / (data.leave[i] + data.remain[i]);
-      data.remain[i] = 100 - data.leave[i];
+    for (i = 0; i < data.labour.length; i++) {
+      var total = data.labour[i] + data.tory[i] + data.libDem[i] + data.tory[
+        i];
+      data.labour[i] = 100 * data.labour[i] / total;
+      data.tory[i] = 100 * data.tory[i] / total;
+      data.libDem[i] = 100 * data.libDem[i] / total;
+      data.snp[i] = 100 * data.snp[i] / total;
     }
   }
 
-
-  function createSlider(index) {
-
-    var remainP = 48;
-    var leaveP = 52;
-
-
-    var container = d3.select('.slider-chart');
-    var slider = container.append('div')
-      .attr('class', 'slider')
-
-    slider.append('div')
-      .attr('class', 'slider-remain')
-      .style('width', remainP + '%')
-      .text(remainP + '%')
-
-    slider.append('div')
-      .attr('class', 'slider-leave')
-      .style('width', leaveP + '%')
-      .text(leaveP + '%')
-
-    container.append('div')
-      .attr('class', 'slider-time')
-      .text(moment(new Date(2016, 5, 23, 0, 0, 0, 0)).format('MMMM Do YYYY'))
-  }
+  // TODO: update this
+  // function createSlider(index) {
+  //
+  //   var remainP = 48;
+  //   var leaveP = 52;
+  //
+  //
+  //   var container = d3.select('.slider-chart');
+  //   var slider = container.append('div')
+  //     .attr('class', 'slider')
+  //
+  //   slider.append('div')
+  //     .attr('class', 'slider-remain')
+  //     .style('width', remainP + '%')
+  //     .text(remainP + '%')
+  //
+  //   slider.append('div')
+  //     .attr('class', 'slider-leave')
+  //     .style('width', leaveP + '%')
+  //     .text(leaveP + '%')
+  //
+  //   container.append('div')
+  //     .attr('class', 'slider-time')
+  //     .text(moment(new Date(2016, 5, 23, 0, 0, 0, 0)).format('MMMM Do YYYY'))
+  // }
 })();
