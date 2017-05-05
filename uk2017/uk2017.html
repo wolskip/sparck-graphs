@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style> /* set the CSS */
+
+path {
+    stroke-width: 2;
+    fill: none;
+}
+.axis path,
+.axis line {
+    fill: none;
+    stroke: grey;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
+.x.axis .domain{
+    stroke: transparent;
+}
+.xaxisbrexit
+{
+    stroke: grey;
+}
+.line-remain
+{
+   stroke: #1a84ec;
+}
+.line-leave
+{
+   stroke: #FF0000;
+}
+.line-vals-average{
+    stroke: black;
+}
+.graph-overlay{
+  fill: transparent
+}
+.focus-line{
+  stroke-width: 1;
+  stroke: #999;
+}
+.label-left,.label-right{
+  stroke-width: 1;
+  stroke: #bbb;
+  stroke-dasharray: 3;
+}
+.label-bottom{
+  stroke: #FF0000;
+  stroke-width: 3;
+}
+svg
+{
+    font-family: 'Oswald';
+    font-size: 16px;
+}
+
+
+.slider{
+  position: relative;
+  width: 500px;
+  margin: auto;
+  height: 30px;
+  background-color: red;
+  color: #fff;
+}
+.slider * {
+    box-sizing: border-box;
+}
+.slider-remain{
+  height: 30px;
+  background-color: #1a84ec;
+  float: left;
+  text-align: left;
+  padding: 5px 10px;
+}
+.slider-leave{
+  height: 30px;
+  background-color: red;
+  float: right;
+  text-align: right;
+  padding: 5px 10px;
+}
+.slider-time{
+  color: #999;
+  padding-top: 5px;
+}
+
+.focus-label-leave
+{
+  fill: red;
+}
+
+.percentage-chart-label
+{
+  min-height: 65px;
+  padding: 5px;
+  max-width: 700px;
+  margin: auto;
+}
+
+.brexit-label-bottom{
+  stroke: black;
+  stroke-width: 3;
+}
+
+
+
+</style>
+<body>
+
+<div class="live-chart">
+</div>
+<div class="count-chart">
+</div>
+<div class="percentage-chart">
+</div>
+
+<div class="slider-chart">
+</div>
+
+
+<!-- load the d3.js library -->
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/momentjs/2.13.0/moment.min.js"></script>
+<script type="text/javascript" src="uk2017.js"></script>
+</body>
