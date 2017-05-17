@@ -303,7 +303,7 @@
         .attr("class", "focus-label-snp")
         .attr("dx", 5)
         .attr("dy", 40)
-        .style("fill", "#F7DB15")       
+        .style("fill", "#F7DB15")    
         .text("");
 
       svg.append("rect")
