@@ -1,30 +1,30 @@
-(function() {
+(function () {
   var containerGraph1 = '.count-chart';
   var containerGraph2 = '.percentage-chart';
   var labels = [];
 
 
   function jsonWithRetry(url, retries, success) {
-    var load = function() {
-        d3.json(url, function(error, json) {
-          error = error || json.errorMessage;
-          retries--;
-          if (error) {
-            console.log(error);
-            if (retries > 0) {
-              load();
-            }
-          } else {
-            success(json);
+    var load = function () {
+      d3.json(url, function (error, json) {
+        error = error || json.errorMessage;
+        retries--;
+        if (error) {
+          console.log(error);
+          if (retries > 0) {
+            load();
           }
-        });
-      }
-      load();
+        } else {
+          success(json);
+        }
+      });
+    }
+    load();
     success();
   }
 
   drawGraph(containerGraph1);
-  drawGraph(containerGraph2, updateToPercentage, function(n) {
+  drawGraph(containerGraph2, updateToPercentage, function (n) {
     return n + "%";
   });
 
@@ -38,11 +38,11 @@
 
     // Set the dimensions of the canvas / graph
     var margin = {
-        top: 30,
-        right: 20,
-        bottom: 30,
-        left: 55
-      },
+      top: 30,
+      right: 20,
+      bottom: 30,
+      left: 55
+    },
       width = 700 - margin.left - margin.right,
       height = 370 - margin.top - margin.bottom;
 
@@ -56,28 +56,28 @@
     var xAxis = d3.svg.axis().scale(x)
       .orient("bottom")
       .tickFormat(d3.time.format.multi([
-        [".%L", function(d) {
+        [".%L", function (d) {
           return d.getMilliseconds();
         }],
-        [":%S", function(d) {
+        [":%S", function (d) {
           return d.getSeconds();
         }],
-        ["%_H:%M", function(d) {
+        ["%_H:%M", function (d) {
           return d.getMinutes();
         }],
-        ["%_H:00", function(d) {
+        ["%_H:00", function (d) {
           return d.getHours();
         }],
-        ["%a %d", function(d) {
+        ["%a %d", function (d) {
           return d.getDay() && d.getDate() != 1;
         }],
-        ["%b %d", function(d) {
+        ["%b %d", function (d) {
           return d.getDate() != 1;
         }],
-        ["%B", function(d) {
+        ["%B", function (d) {
           return d.getMonth();
         }],
-        ["%Y", function() {
+        ["%Y", function () {
           return true;
         }]
       ]));
@@ -93,19 +93,19 @@
     // Define the line
     var valueline = d3.svg.line()
       .interpolate("monotone")
-      .x(function(v, i) {
+      .x(function (v, i) {
         return x(data.time[i]);
       })
-      .y(function(v) {
+      .y(function (v) {
         return y(v);
       });
 
     // Define the line
     var line = d3.svg.line()
-      .x(function(v) {
+      .x(function (v) {
         return v[0];
       })
-      .y(function(v) {
+      .y(function (v) {
         return v[1];
       });
 
@@ -155,7 +155,7 @@
       x.domain([minDate, moment(maxDate).add(1, "hours")._d]);
 
       y.domain([d3.min([d3.min(data.labour), d3.min(data.tory), d3.min(data.libDem),
-        d3.min(data.snp)
+      d3.min(data.snp)
       ]), maxYValue]);
     }
 
@@ -262,54 +262,58 @@
       var focusCircleLabour = focusGroup.append("g");
       focusCircleLabour.append("circle").attr("r", 3);
 
-      var focusLabelLabour = focusCircleLabour
+      var focusLabelLabour = focusGroup
         .append("text")
         .attr("class", "focus-label-labour")
         .attr("dx", 5)
-        .attr("dy", -5)
+        .attr("dy", 10)
+        .style("fill", "#ED1E0E")        
         .text("");
 
 
       var focusCircleTory = focusGroup.append("g");
       focusCircleTory.append("circle").attr("r", 3);
 
-      var focusLabelTory = focusCircleTory
+      var focusLabelTory = focusGroup
         .append("text")
         .attr("class", "focus-label-tory")
         .attr("dx", 5)
         .attr("dy", -5)
+        .style("fill", "#00f")
         .text("");
 
 
       var focusCircleLibDem = focusGroup.append("g");
       focusCircleLibDem.append("circle").attr("r", 3);
 
-      var focusLabelLibDem = focusCircleLibDem
+      var focusLabelLibDem = focusGroup
         .append("text")
         .attr("class", "focus-label-libDem")
         .attr("dx", 5)
-        .attr("dy", -5)
+        .attr("dy", 25)
+        .style("fill", "#E56600")
         .text("");
 
 
       var focusCircleSNP = focusGroup.append("g");
       focusCircleSNP.append("circle").attr("r", 3);
 
-      var focusLabelSNP = focusCircleSNP
+      var focusLabelSNP = focusGroup
         .append("text")
         .attr("class", "focus-label-snp")
         .attr("dx", 5)
-        .attr("dy", -5)
+        .attr("dy", 40)
+        .style("fill", "#F7DB15")       
         .text("");
 
       svg.append("rect")
         .attr("class", "graph-overlay")
         .attr("width", width)
         .attr("height", height)
-        .on("mouseover", function() {
+        .on("mouseover", function () {
           focusGroup.style("display", null);
         })
-        .on("mouseout", function() {
+        .on("mouseout", function () {
           focusGroup.style("display", "none");
         })
         .on("mousemove", mousemove)
@@ -362,31 +366,37 @@
           // focusLabelRemain.text(textRemain);
 
           var textLabour = tickFormat != undefined ? tickFormat(Math.round(
-            data.labour[index])) : Math.round(data.labour[index]);
+            data.labour[index])) : Math.round(data.labour[index] * 100) / 100;
           focusLabelLabour.text(textLabour);
 
           var textTory = tickFormat != undefined ? tickFormat(Math.round(
-            data.tory[index])) : Math.round(data.tory[index]);
+            data.tory[index])) : Math.round(data.tory[index] * 100) / 100;
           focusLabelTory.text(textTory);
 
           var textLibDem = tickFormat != undefined ? tickFormat(Math.round(
-            data.libDem[index])) : Math.round(data.libDem[index]);
+            data.libDem[index])) : Math.round(data.libDem[index] * 100) / 100;
           focusLabelLibDem.text(textLibDem);
 
           var textSNP = tickFormat != undefined ? tickFormat(Math.round(
-            data.snp[index])) : Math.round(data.snp[index]);
+            data.snp[index])) : Math.round(data.snp[index] * 100) / 100;
           focusLabelSNP.text(textSNP);
 
           focusLine.attr("transform", "translate(" + circleX + ",0)");
 
-          focusCircleLabour.attr("transform", "translate(" + circleX + ","+ y(data.labour[index]) +")")
+
+          focusCircleLabour.attr("transform", "translate(" + circleX + "," + y(data.labour[index]) + ")")
             .attr("cy", data.labour[index]);
-          focusCircleTory.attr("transform", "translate(" + circleX + ","+ y(data.tory[index])+")");
-          focusCircleLibDem.attr("transform", "translate(" + circleX + ","+ y(data.libDem[index])+")");
-          focusCircleSNP.attr("transform", "translate(" + circleX + ","+ y(data.snp[index])+")");
+          focusCircleTory.attr("transform", "translate(" + circleX + "," + y(data.tory[index]) + ")");
+          focusCircleLibDem.attr("transform", "translate(" + circleX + "," + y(data.libDem[index]) + ")");
+          focusCircleSNP.attr("transform", "translate(" + circleX + "," + y(data.snp[index]) + ")");
+
+          focusLabelTory.attr("transform", "translate(" + mouseX + ", 10)");
+          focusLabelLibDem.attr("transform", "translate(" + mouseX + ", 10)");
+          focusLabelSNP.attr("transform", "translate(" + mouseX + ", 10)");
+          focusLabelLabour.attr("transform", "translate(" + mouseX + ", 10)");
         }
 
-        var activeLabel = labels.filter(function(label) {
+        var activeLabel = labels.filter(function (label) {
           return label.start < dataX && dataX < label.end
         })[0];
 
@@ -453,7 +463,7 @@
     function updateLabels() {
 
       labelElements.selectAll(".label-left")
-        .attr("d", function(data) {
+        .attr("d", function (data) {
           var start = getDateX(data.start);
           return line([
             [start, 0],
@@ -462,7 +472,7 @@
         });
 
       labelElements.selectAll(".label-right")
-        .attr("d", function(data) {
+        .attr("d", function (data) {
           var start = getDateX(data.end);
           return line([
             [start, 0],
@@ -471,7 +481,7 @@
         });
 
       labelElements.selectAll(".election-2017-label-bottom")
-        .attr("d", function(data) {
+        .attr("d", function (data) {
           return line([
             [getDateX(data.start), height - 4],
             [getDateX(data.end), height - 4]
@@ -485,18 +495,18 @@
       jsonWithRetry(
         "https://4vp2c3noje.execute-api.eu-west-1.amazonaws.com/prod/frontend",
         1,
-        function(json) {
+        function (json) {
 
           data = {};
 
-          if(!json)return;
+          if (!json) return;
 
           data.tory = json.tories;
           data.snp = json.snp;
           data.time = json.time;
           data.labour = json.labour;
           data.libDem = json.libdem;
-  
+
           updateDataSet(data);
           if (updateData) {
             updateData(data);
@@ -514,7 +524,7 @@
     }
 
     function updateDataSet() {
-      data.time.forEach(function(element, i, arr) {
+      data.time.forEach(function (element, i, arr) {
         arr[i] = moment(element).add(1, 'hours')._d; // convert from UTC - to UK summer + hour interval start -> interval end
       });
     }
