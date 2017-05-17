@@ -2,21 +2,21 @@
   var containerGraph1 = '.count-chart';
   var containerGraph2 = '.percentage-chart';
   var labels = [
-      {
-        "start": new Date(2016, 5, 19, 0, 0, 0, 0),
-        "end": new Date(2016, 5, 22, 23, 0, 0, 0),
-        "title": " In the run-up to polling day, Leave had a big lead, which shrunk as the actual day loomed."      
-      },
-      {
-        "start": new Date(2016, 5, 23, 0, 0, 0, 0),
-        "end": new Date(2016, 5, 23, 23, 0, 0, 0),
-        "title": "Polling day was turbulent, with both campaigns neck and neck."
-      },
-      {
-        "start": new Date(2016, 5, 24, 0, 0, 0, 0),
-        "end": new Date(2016, 5, 24, 23, 0, 0, 0),
-        "title": "The day after polling day saw a significant boost for Leave as the results became clear."
-      }   
+//      {
+//        "start": new Date(2016, 5, 19, 0, 0, 0, 0),
+//        "end": new Date(2016, 5, 22, 23, 0, 0, 0),
+//        "title": " In the run-up to polling day, Leave had a big lead, which shrunk as the actual day loomed."
+//      },
+//      {
+//        "start": new Date(2016, 5, 23, 0, 0, 0, 0),
+//        "end": new Date(2016, 5, 23, 23, 0, 0, 0),
+//        "title": "Polling day was turbulent, with both campaigns neck and neck."
+//      },
+//      {
+//        "start": new Date(2016, 5, 24, 0, 0, 0, 0),
+//        "end": new Date(2016, 5, 24, 23, 0, 0, 0),
+//        "title": "The day after polling day saw a significant boost for Leave as the results became clear."
+//      }
     ];
 
 
@@ -39,14 +39,15 @@
   }
 
 drawGraph(containerGraph1);
-drawGraph(containerGraph2, updateToPercentage, function(n){ return n + "%"; });
+// drawGraph(containerGraph2, updateToPercentage, function(n){ return n + "%"; });
+drawGraph(containerGraph2, updateToTotal, function(n){ return n; });
 
 var rawData;
 
 function drawGraph(containerGraph, updateData, tickFormat)
 {
-  var start = new Date(2016, 5, 15, 0, 0, 0, 0);
-  var end = new Date(2016, 5, 25, 1, 0, 0, 0);
+  var start = new Date(2016, 10, 11, 0, 0, 0, 0);
+  var end = new Date(2016, 10, 14, 7, 0, 0, 0);
 
   var loaded;
 
@@ -117,9 +118,9 @@ function drawGraph(containerGraph, updateData, tickFormat)
         .attr("class", "percentage-chart-label")
 
       var div = d3.select('.percentage-chart-label');
-        
+
         div.append("p");
-    }  
+    }
 
   var data;
   var zoom = d3.behavior.zoom();
@@ -130,25 +131,25 @@ function drawGraph(containerGraph, updateData, tickFormat)
   {
       minDate = d3.min(data.time);
       maxDate = d3.max(data.time);
-      
-      length = data.time.length;      
-      
-      maxYValue = d3.max([d3.max(data.remain), d3.max(data.leave)]);
 
-      // Scale the range of the data      
+      length = data.time.length;
+
+      maxYValue = d3.max([d3.max(data.clinton), d3.max(data.trump)]);
+
+      // Scale the range of the data
       var minDate = new Date(minDate);
       minDate.setDate(minDate.getDate());
-      
-      x.domain([minDate, moment(maxDate).add(1, "hours")._d]);      
-      
-      y.domain([d3.min([d3.min(data.remain), d3.min(data.leave)]), maxYValue]);
+
+      x.domain([minDate, moment(maxDate).add(1, "hours")._d]);
+
+      y.domain([d3.min([d3.min(data.clinton), d3.min(data.trump)]), maxYValue]);
   }
-  
-  
+
+
   function loadGraph()
   {
       loaded = true;
-     
+
       updateDomain();
       zoom.x(x);
 
@@ -173,12 +174,12 @@ function drawGraph(containerGraph, updateData, tickFormat)
         svg.append("path")
               .attr("class", "line-remain")
               .attr("clip-path", "url(#clip-all-brexit)")
-              .attr("d", valueline(data.remain));
+              .attr("d", valueline(data.clinton));
 
         svg.append("path")
               .attr("class", "line-leave")
               .attr("clip-path", "url(#clip-all-brexit)")
-              .attr("d", valueline(data.leave));
+              .attr("d", valueline(data.trump));
 
          labelElements  = svg.selectAll(".percentage-chart-label").data(labels);
         var labelGroups = labelElements.enter()
@@ -201,8 +202,8 @@ function drawGraph(containerGraph, updateData, tickFormat)
 
         if(updateData){
             updateLabels();
-        } 
-        
+        }
+
         // Add the X Axis
         svg.append("g")
             .attr("class", "x axis")
@@ -229,10 +230,10 @@ function drawGraph(containerGraph, updateData, tickFormat)
         .attr("dx", 5)
         .attr("dy",-5)
         .text("");
-        
+
         var focusCircleLeave = focusGroup.append("g");
         focusCircleLeave.append("circle").attr("r", 3);
-       
+
         var focusLabelLeave = focusCircleLeave
         .append("text")
         .attr("class", "focus-label-leave")
@@ -254,35 +255,35 @@ function drawGraph(containerGraph, updateData, tickFormat)
 
             var mouseX = d3.mouse(this)[0]
             var dataX = x.invert(mouseX);
-            
-            
+
+
             index = 0;
             while(data.time[index] && dataX.getTime() > data.time[index].getTime()){
               index ++
-            } 
+            }
             index --;
-            
+
            if(index < 0 || index > length -1){
              focusGroup.style("display", "none");
            } else {
              focusGroup.style("display", null);
              var circleX = x(dataX);
-             
-             var compare = data.leave[dataX] > data.remain[dataX];
-             var topPosition = y(d3.max([d3.max(data.leave), d3.max(data.remain)]));
+
+             var compare = data.trump[dataX] > data.clinton[dataX];
+             var topPosition = y(d3.max([d3.max(data.trump), d3.max(data.clinton)]));
              var bottomPosition = topPosition + 30;
-             
-             var circleYRemain = data.leave[dataX] > data.remain[dataX] ? topPosition : bottomPosition;
-             var circleYLeave = data.leave[dataX] <= data.remain[dataX] ? bottomPosition : topPosition;
-             
-             var textLeave = tickFormat != undefined ? tickFormat(Math.round(data.leave[index])) : Math.round(data.leave[index]);
+
+             var circleYRemain = data.trump[dataX] > data.clinton[dataX] ? topPosition : bottomPosition;
+             var circleYLeave = data.trump[dataX] <= data.clinton[dataX] ? bottomPosition : topPosition;
+
+             var textLeave = tickFormat != undefined ? tickFormat(Math.round(data.trump[index])) : Math.round(data.trump[index]);
              focusLabelLeave.text(textLeave);
-             
-             var textRemain = tickFormat != undefined ? tickFormat(Math.round(data.remain[index])) : Math.round(data.remain[index]);
+
+             var textRemain = tickFormat != undefined ? tickFormat(Math.round(data.clinton[index])) : Math.round(data.clinton[index]);
              focusLabelRemain.text(textRemain);
-             
+
              focusLine.attr("transform", "translate(" + circleX + ",0)");
-             
+
              focusCircleRemain.attr("transform", "translate(" + circleX + "," + circleYRemain  + ")");
              focusCircleLeave.attr("transform", "translate(" + circleX + "," + circleYLeave  + ")");
            }
@@ -297,12 +298,12 @@ function drawGraph(containerGraph, updateData, tickFormat)
          function mousezoom(){
             updatePosition();
             redraw();
-         }          
-         
+         }
+
   }
-  
+
   function updatePosition(){
-    
+
     var minDate = d3.min(data.time);
     var maxDate = d3.max(data.time);
 
@@ -320,9 +321,9 @@ function drawGraph(containerGraph, updateData, tickFormat)
 
     if(currentTranstate[0] < min){
         zoom.translate([min, currentTranstate[1]]);
-    }    
+    }
   }
-  
+
   function indexOfDate(myArray, searchDate) {
     for(var i = 0, len = myArray.length; i < len; i++) {
         if (myArray[i].toString() === searchDate.toString()) return i;
@@ -331,10 +332,10 @@ function drawGraph(containerGraph, updateData, tickFormat)
   }
 
   function redraw(){
-    
+
     // Add the valueline path.
-    svg.select(".line-leave").attr("d", valueline(data.leave));
-    svg.select(".line-remain").attr("d", valueline(data.remain));
+    svg.select(".line-leave").attr("d", valueline(data.trump));
+    svg.select(".line-remain").attr("d", valueline(data.clinton));
 
     // Add the Y Axis
     svg.select(".y.axis").call(yAxis);
@@ -372,67 +373,78 @@ function drawGraph(containerGraph, updateData, tickFormat)
   loadPastData();
   function loadPastData()
   {
-      jsonWithRetry("https://ps4ez07vul.execute-api.eu-west-1.amazonaws.com/v1/brexit/static-graph-data", 3, function(json) {
-          
+      jsonWithRetry("http://ec2-54-154-200-189.eu-west-1.compute.amazonaws.com:8090/tweets", 3, function(json) {
+
           data = json;
-         
+
           updateDataSet(data);
           if (updateData)
           {
-            updateData(data); 
-
-            var resultsIndex =  indexOfDate(data.time, new Date(2016, 5, 23, 1, 0, 0, 0));
-            createSlider(resultsIndex);         
+            updateData(data);
+            var resultsIndex =  indexOfDate(data.time, new Date(2016, 10, 11, 0, 0, 0, 0));
+            createSlider(resultsIndex);
           }
 
           loadGraph();
-          
+
           if(!updateData){
-            rawData = data;        
+            rawData = data;
           }
       });
   }
-  
+
   function updateDataSet()
-  {     
+  {
       data.time.forEach(function(element, i, arr) {
-          arr[i] = moment(element).add(1, 'hours')._d; // convert from UTC - to UK summer + hour interval start -> interval end
-      }); 
+//      for now all in utc
+          arr[i] = moment(element).add(0, 'hours')._d; // convert from UTC - to UK summer + hour interval start -> interval end
+      });
   }
 }
 
 function updateToPercentage(data)
 {
-    for(i=0; i< data.leave.length; i++)
+    for(i=0; i< data.trump.length; i++)
     {
-          data.leave[i] = 100 * data.leave[i] / (data.leave[i] + data.remain[i]);
-          data.remain[i] = 100 - data.leave[i];
+          all = data.trump[i] + data.clinton[i] + data.nn[i];
+          data.trump[i] = 100 * data.trump[i] / all;
+          data.clinton[i] = 100 * data.clinton[i] / all;
     }
 }
 
 
+function updateToTotal(data)
+{
+    for(i=0; i< data.trump.length; i++)
+    {
+//          all = data.trump[i] + data.clinton[i] + data.nn[i];
+//          data.trump[i] = 100 * data.trump[i] / all;
+//          data.clinton[i] = 100 * data.clinton[i] / all;
+    }
+}
+
 function createSlider(index){
 
-   var remainP = 48;
-   var leaveP =  52;
+   var clintonP = 48;
+   var trumpP =  52;
 
-    
+
     var container = d3.select('.slider-chart');
     var slider = container.append('div')
         .attr('class', 'slider')
 
     slider.append('div')
         .attr('class', 'slider-remain')
-        .style('width', remainP + '%')
-        .text(remainP + '%')
+        .style('width', clintonP + '%')
+        .text(clintonP + '%')
 
     slider.append('div')
         .attr('class', 'slider-leave')
-        .style('width', leaveP + '%')
-        .text(leaveP + '%')
+        .style('width', trumpP + '%')
+        .text(trumpP + '%')
 
     container.append('div')
       .attr('class', 'slider-time')
-      .text(moment(new Date(2016, 5, 23, 0, 0, 0, 0)).format('MMMM Do YYYY'))
+      .text(moment(new Date(2016, 10, 11, 0, 0, 0, 0)).format('MMMM Do YYYY'))
 }
 })();

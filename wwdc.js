@@ -53,7 +53,7 @@
 
   // Set the dimensions of the canvas / graph
   var margin = {top: 30, right: 20, bottom: 30, left: 50},
-      width = 900 - margin.left - margin.right,
+      width = 700 - margin.left - margin.right,
       height = 370 - margin.top - margin.bottom;
 
   // Set the ranges
@@ -61,7 +61,7 @@
   var y = d3.scale.linear().range([height, 0]);
 
   var timeToX = d3.time.scale()
-    .range([0, 960])
+    .range([0, width])
     .domain([new Date(2016, 5, 13, 17, 0, 0, 0), new Date(2016, 5, 13, 21, 0, 0, 0)])
 
 
@@ -173,7 +173,7 @@
           .attr("height", Math.max(0, height - y(0)));
 
           svg.append("clipPath")
-              .attr("id", "clip-all")
+              .attr("id", "clip-all-wwdc")
               .append("rect")
               .attr("x", 0)
               .attr("y", 0)
@@ -192,7 +192,7 @@
 
         svg.append("path")
               .attr("class", "line-vals-average")
-              .attr("clip-path", "url(#clip-all)")
+              .attr("clip-path", "url(#clip-all-wwdc)")
               .attr("d", valuelineaverage(data.balance));
 
 
@@ -200,19 +200,19 @@
         var labelGroups = labelElements.enter()
           .append("g")
             .attr("class", "label-group")
-            .attr("clip-path", "url(#clip-all)");
+            .attr("clip-path", "url(#clip-all-wwdc)");
 
         labelGroups.append("path")
               .attr("class", "label-left")
-              .attr("clip-path", "url(#clip-all)")
+              .attr("clip-path", "url(#clip-all-wwdc)")
               .attr("d", line([[0,0], [0,height]]));
         labelGroups.append("path")
               .attr("class", "label-right")
-              .attr("clip-path", "url(#clip-all)")
+              .attr("clip-path", "url(#clip-all-wwdc)")
               .attr("d", line([[0,0], [0,height]]));
         labelGroups.append("path")
               .attr("class", "label-bottom")
-              .attr("clip-path", "url(#clip-all)")
+              .attr("clip-path", "url(#clip-all-wwdc)")
               .attr("d", line([[0,0], [0,0]]));
 
 

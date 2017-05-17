@@ -2,7 +2,6 @@
 <meta charset="utf-8">
 <style> /* set the CSS */
 
-body { font: 12px Arial;}
 path {
     stroke-width: 2;
     fill: none;
@@ -17,7 +16,7 @@ path {
 .x.axis .domain{
     stroke: transparent;
 }
-.xaxisbrexit 
+.xaxisbrexit
 {
     stroke: grey;
 }
@@ -59,22 +58,62 @@ svg
   position: relative;
   width: 500px;
   margin: auto;
-  height: 20px;
+  height: 30px;
   background-color: red;
+  color: #fff;
+}
+.slider * {
+    box-sizing: border-box;
+}
+.slider-remain{
+  height: 30px;
+  background-color: #1a84ec;
+  float: left;
+  text-align: left;
+  padding: 5px 10px;
+}
+.slider-leave{
+  height: 30px;
+  background-color: red;
+  float: right;
+  text-align: right;
+  padding: 5px 10px;
+}
+.slider-time{
+  color: #999;
+  padding-top: 5px;
 }
 
-.slider-remain{
-  height: 20px;
-  background-color: #1a84ec;
+.focus-label-leave
+{
+  fill: red;
 }
+
+.percentage-chart-label
+{
+  min-height: 65px;
+  padding: 5px;
+  max-width: 700px;
+  margin: auto;
+}
+
+.brexit-label-bottom{
+  stroke: black;
+  stroke-width: 3;
+}
+
+
 
 </style>
 <body>
 
+<div class="live-chart">
+</div>
 <div class="count-chart">
 </div>
 <div class="percentage-chart">
 </div>
+
 <div class="slider-chart">
 </div>
 
